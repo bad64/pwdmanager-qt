@@ -6,7 +6,7 @@ DBRow *MainWindow::ReadFromFile()
 {
     free(db);
 
-    fstream file(user.path, ios::in);
+    fstream file(user.path);
 
     if (!file)
     {
@@ -72,7 +72,7 @@ DBRow *MainWindow::ReadFromFile()
 
 void MainWindow::WriteToFile()
 {
-    fstream file(user.path, ios::out);
+    ofstream file(user.path);
 
     for (unsigned int i = 0; i < lines; i++)
     {
@@ -122,7 +122,6 @@ void MainWindow::Delete()
    }
 
    WriteToFile();
-   db = ReadFromFile();
    RefreshView();
 }
 
@@ -158,7 +157,6 @@ void MainWindow::Edit()
    }
 
    WriteToFile();
-   db = ReadFromFile();
    RefreshView();
 }
 

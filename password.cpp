@@ -87,6 +87,8 @@ void MainWindow::NewEntry()
     if (proceed == false)
         return;
 
+    printf("%s  ", buffer.username);
+
     do
     {
         buffer.purpose =(char *)QInputDialog::getText(this, "Enter reason", "Please enter what these credentials will be used for:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
@@ -94,6 +96,8 @@ void MainWindow::NewEntry()
             return;
 
     }while (strcmp(buffer.purpose, "") == 0);
+
+    printf("%s  ", buffer.purpose);
 
     needsGeneration = QMessageBox::question(this, "Password Generation", "Shall the software generate a password ?", QMessageBox::Yes | QMessageBox::No);
 
@@ -110,19 +114,23 @@ void MainWindow::NewEntry()
             return;
     }
 
-    //lines += 1;
+    printf("%s\n", buffer.password);
+
     buffer.id = lines+1;
 
     DBRow* temp = db;
 
-    db = (DBRow *)malloc(sizeof(DBRow) * lines+1);
+    db = (DBRow *)malloc(sizeof(DBRow) * (lines+1));
     for (unsigned int i = 0; i < lines; i++)
         db[i] = temp[i];
 
-    db[lines] = buffer;
+    db[lines].id = buffer.id;
+    db[lines].username = buffer.username;
+    db[lines].purpose = buffer.purpose;
+    db[lines].password = buffer.password;
+
     lines++;
 
     WriteToFile();
-    db = ReadFromFile();
     RefreshView();
 }
