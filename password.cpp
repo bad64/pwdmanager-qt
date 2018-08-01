@@ -79,44 +79,45 @@ const char* MainWindow::Generate()
 
 void MainWindow::NewEntry()
 {
-    DBRow buffer;
+    int id = 0;
+    QString unamebuf, prbuf, pwdbuf;
+
     int needsGeneration = 0;
     bool proceed = true;
 
-    buffer.username = (char *)QInputDialog::getText(this, "Enter username", "Please enter the user name for this entry:", QLineEdit::Normal, QString(user.username), &proceed).toStdString().c_str();
+    unamebuf = QInputDialog::getText(this, "Enter username", "Please enter the user name for this entry:", QLineEdit::Normal, QString(user.username), &proceed).toStdString().c_str();
     if (proceed == false)
         return;
 
-    printf("%s  ", buffer.username);
-
     do
     {
-        buffer.purpose =(char *)QInputDialog::getText(this, "Enter reason", "Please enter what these credentials will be used for:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
+        prbuf = QInputDialog::getText(this, "Enter reason", "Please enter what these credentials will be used for:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
         if (proceed == false)
             return;
 
-    }while (strcmp(buffer.purpose, "") == 0);
-
-    printf("%s  ", buffer.purpose);
+    }while (strcmp(prbuf.toStdString().c_str(), "") == 0);
 
     needsGeneration = QMessageBox::question(this, "Password Generation", "Shall the software generate a password ?", QMessageBox::Yes | QMessageBox::No);
 
     if (needsGeneration == QMessageBox::No)
     {
-        buffer.password = (char *)QInputDialog::getText(this, "Enter password", "Please enter the password that will be stored:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
+        pwdbuf = QInputDialog::getText(this, "Enter password", "Please enter the password that will be stored:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
         if (proceed == false)
             return;
     }
     else
     {
-        buffer.password = (char *)Generate();
-        if (strcmp(buffer.password, "") == 0)
+        pwdbuf = Generate();
+        if (strcmp(pwdbuf.toStdString().c_str(), "") == 0)
             return;
     }
 
-    printf("%s\n", buffer.password);
+    //Eliminate commas
+    unamebuf.remove(QChar(','));
+    prbuf.remove(QChar(','));
+    pwdbuf.remove(QChar(','));
 
-    buffer.id = lines+1;
+    id = lines+1;
 
     DBRow* temp = db;
 
@@ -124,10 +125,16 @@ void MainWindow::NewEntry()
     for (unsigned int i = 0; i < lines; i++)
         db[i] = temp[i];
 
-    db[lines].id = buffer.id;
-    db[lines].username = buffer.username;
-    db[lines].purpose = buffer.purpose;
-    db[lines].password = buffer.password;
+    db[lines].id = id;
+
+    db[lines].username = (char *)malloc(sizeof(DBRow) * (strlen(unamebuf.toStdString().c_str())+1));
+    strcpy(db[lines].username, unamebuf.toStdString().c_str());
+
+    db[lines].purpose = (char *)malloc(sizeof(DBRow) * (strlen(prbuf.toStdString().c_str())+1));
+    strcpy(db[lines].purpose, prbuf.toStdString().c_str());
+
+    db[lines].password = (char *)malloc(sizeof(DBRow) * (strlen(pwdbuf.toStdString().c_str())+1));
+    strcpy(db[lines].password, pwdbuf.toStdString().c_str());
 
     lines++;
 

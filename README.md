@@ -1,4 +1,4 @@
-#Password Manager, now with Qt !
+# Password Manager, now with Qt !
 
 A large(ish) rework of my console-only multiplatform password manager that you can find on this GitHub (right [here](https://github.com/bad64/pwdmanager)).
 

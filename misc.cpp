@@ -2,7 +2,12 @@
 
 void MainWindow::Help()
 {
-
+    QMessageBox::information(this, "Help", "Add a new row with New Entry.\n"
+                                            "Double click on a cell, or highlight it then press the Edit button to edit its contents.\n"
+                                            "Highlight a cell and press Delete to erase the entire row.\n"
+                                            "Copy copies the highlighted row's password field into your OS' clipboard.\n\n"
+                                            "The search field looks for a case-sensitive exact match of the string entered (for example, "
+                                            "it will not match \"test\" with either \"Test\" or \"testing\".");
 }
 
 void MainWindow::About()
