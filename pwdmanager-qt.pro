@@ -1,5 +1,3 @@
-QMAKE_LFLAGS += -static
-
 QT += widgets
 
 SOURCES += \
