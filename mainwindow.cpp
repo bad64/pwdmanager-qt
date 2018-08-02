@@ -11,6 +11,14 @@ MainWindow::MainWindow()
 
     //Menu bar
     QMenu* optionFile = menuBar()->addMenu("&File");
+        QAction* actionImport = new QAction("&Import", this);
+        optionFile->addAction(actionImport);
+        QObject::connect(actionImport, SIGNAL(triggered()), this, SLOT(Import()));
+
+        QAction* actionExport = new QAction("&Export", this);
+        optionFile->addAction(actionExport);
+        QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(Export()));
+
         QAction* actionRefresh = new QAction("&Refresh View", this);
         actionRefresh->setShortcut(Qt::Key_F5);
         optionFile->addAction(actionRefresh);

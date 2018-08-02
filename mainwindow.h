@@ -19,6 +19,9 @@ public:
 public slots:
     DBRow* ReadFromFile();
     void WriteToFile();
+    void Import();
+    void Export();
+    void Backup();
 
     void RefreshView();
     void NewEntry();

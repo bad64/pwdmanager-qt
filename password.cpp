@@ -79,6 +79,8 @@ const char* MainWindow::Generate()
 
 void MainWindow::NewEntry()
 {
+    Backup();
+
     int id = 0;
     QString unamebuf, prbuf, pwdbuf;
 

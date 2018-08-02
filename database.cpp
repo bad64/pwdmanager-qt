@@ -82,13 +82,87 @@ void MainWindow::WriteToFile()
     file.close();
 }
 
+void MainWindow::Import()
+{
+    char* buf = new char[255];
+    #if (defined (_WIN32) || defined (_WIN64))
+        strcpy(buf, getenv("USERPROFILE"));
+        strcat(buf, "\\Documents");
+    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        strcpy(buf, getenv("HOME"));
+    #endif
+
+    QString filepath = QFileDialog::getOpenFileName(this, "Export", QString(buf));
+
+    if (filepath.isEmpty())
+        return;
+
+    int areyousure = QMessageBox::warning(this, "Warning", "This will replace all entries in the current database with those of the imported database.\n"
+                                                           "This operation is not recoverable. Do you wish to proceed ?", QMessageBox::Yes | QMessageBox::No);
+
+    if (areyousure == QMessageBox::No)
+        return;
+
+    free(db);
+
+    ifstream newfile(filepath.toStdString().c_str());
+    ofstream originalfile(user.path);
+
+    originalfile << newfile.rdbuf();
+
+    newfile.close();
+    originalfile.close();
+    RefreshView();
+}
+
+void MainWindow::Export()
+{
+    char* buf = new char[255];
+    #if (defined (_WIN32) || defined (_WIN64))
+        strcpy(buf, getenv("USERPROFILE"));
+        strcat(buf, "\\Documents");
+    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        strcpy(buf, getenv("HOME"));
+    #endif
+
+    QString filepath = QFileDialog::getSaveFileName(this, "Export", QString(buf));
+
+    ofstream file(filepath.toStdString().c_str());
+
+    for (unsigned int i = 0; i < lines; i++)
+    {
+        file << db[i].id << "," << db[i].username << "," << db[i].purpose << "," << db[i].password << ",\n";
+    }
+
+    file.close();
+}
+
+void MainWindow::Backup()
+{
+    char backuppath[255];
+    strcpy(backuppath, user.path);
+    strcat(backuppath, ".bak");
+
+    ofstream file(backuppath);
+
+    for (unsigned int i = 0; i < lines; i++)
+    {
+        file << db[i].id << "," << db[i].username << "," << db[i].purpose << "," << db[i].password << ",\n";
+    }
+
+    file.close();
+}
+
 void MainWindow::Delete()
 {
-   QItemSelectionModel* selection = table->selectionModel();
+    Backup();
 
-   if (selection->hasSelection())
-   {
-       int areyousure = QMessageBox::warning(this, "Warning", "This will delete the entire row from the database.\nThis operation is not recoverable. Do you wish to proceed ?", QMessageBox::Yes | QMessageBox::No);
+    QItemSelectionModel* selection = table->selectionModel();
+
+    if (selection->hasSelection())
+    {
+       int areyousure = QMessageBox::warning(this, "Warning", "This will delete the entire row from the database.\n"
+                                                              "This operation is not recoverable. Do you wish to proceed ?", QMessageBox::Yes | QMessageBox::No);
 
         if (areyousure == QMessageBox::No)
             return;
@@ -119,18 +193,19 @@ void MainWindow::Delete()
             for (unsigned int j = i; j < lines; j++)
                 db[j].id--;
         }
-   }
+    }
 
-   WriteToFile();
-   RefreshView();
+    WriteToFile();
+    RefreshView();
 }
 
 void MainWindow::Edit()
 {
-   QItemSelectionModel* selection = table->selectionModel();
+    Backup();
+    QItemSelectionModel* selection = table->selectionModel();
 
-   if (selection->hasSelection())
-   {
+    if (selection->hasSelection())
+    {
        int i = table->selectionModel()->currentIndex().row();
        int j = table->selectionModel()->currentIndex().column();
 
@@ -154,18 +229,18 @@ void MainWindow::Edit()
 
        if (proceed == false)
            return;
-   }
+    }
 
-   WriteToFile();
-   RefreshView();
+    WriteToFile();
+    RefreshView();
 }
 
 void MainWindow::Copy()
 {
-   QItemSelectionModel* selection = table->selectionModel();
+    QItemSelectionModel* selection = table->selectionModel();
 
-   if (selection->hasSelection())
-   {
+    if (selection->hasSelection())
+    {
        int i = table->selectionModel()->currentIndex().row();
 
        QClipboard* clipboard = QApplication::clipboard();
@@ -175,5 +250,5 @@ void MainWindow::Copy()
        infotext << "Copied password from row " << i+1 << " to clipboard !" << endl;
 
        QMessageBox::information(this, "Information", infotext.str().c_str());
-   }
+    }
 }

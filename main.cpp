@@ -45,9 +45,52 @@ int main(int argc, char *argv[])
     delete[] buf;
     window.user.path[strlen(window.user.path)] = '\0';
 
+    //Check if directory really exists at user.path
+    struct stat info;
+
+    char temppath[255];
+    #if (defined (_WIN32) || defined (_WIN64))
+        strcpy(temppath, getenv("USERPROFILE"));
+        strcat(temppath, "\\Documents\\passwordmanager");
+    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        strcpy(temppath, getenv("HOME"));
+        strcat(temppath, "/.passwordmanager");
+    #endif
+
+    if (stat(temppath, &info) == 0)
+    {
+        if (info.st_mode & S_IFDIR)
+        {
+            //Means everything is fine. No need to do anything here.
+        }
+        else
+        {
+            char errorString[255];
+            strcpy(errorString, window.user.path);
+            strcat(errorString, " is not a user-writable directory !\nCheck if you have read/write permissions in its parent folder.");
+
+            QMessageBox::critical(nullptr, "Error", QString(errorString));
+            return 1;
+        }
+    }
+    else
+    {
+        #if (defined (_WIN32) || defined (_WIN64))
+            CreateDirectoryA(temppath, NULL);
+        #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+            mkdir(temppath, S_IRWXU);
+            chmod(temppath, S_IRWXU);
+        #endif
+    }
+
     //Setting up the database array
     window.db = window.ReadFromFile();
     window.Init();
+
+    //Linux file permissions
+    #if (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        chmod(window.user.path, S_IRWXU);
+    #endif
 
     //Then render !
     window.show();
