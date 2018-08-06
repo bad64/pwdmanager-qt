@@ -12,8 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define VERSION_MAJOR 1
-#define VERSION_MINOR 01
+#define VERSION "1.10"
 
 //Qt
 #include <QtWidgets>
@@ -44,7 +43,7 @@ struct DBRow
 
 //seed.cpp
 int randint(int minvalue, int maxvalue);
-unsigned long GetSeed();
+unsigned long GetSeed(char *username);
 
 //database.cpp
 DBRow *ReadFromFile(User *user, unsigned int &value);
@@ -53,5 +52,8 @@ void AppendToFile();
 
 //clipboard.cpp
 void CopyToClipboard();
+
+//misc.cpp
+int IsDir();
 
 #endif // INCLUDES_H

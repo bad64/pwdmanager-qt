@@ -2,85 +2,75 @@
 
 int main(int argc, char *argv[])
 {
-    //Seed RNG
-    srand(GetSeed());
-
     //Begin Qt
     QApplication app(argc, argv);
     MainWindow window;
 
-    //Setting up user struct
+    //Setting up user struct, starting with username
+    size_t usernamesize;
     #if (defined (_WIN32) || defined (_WIN64))
-        window.user.username = (char *)malloc(sizeof(char) * strlen(getenv("USERNAME")));
+        usernamesize = (sizeof(char) * (strlen(getenv("USERNAME")) + 1) );
+        window.user.username = (char *)calloc(usernamesize, sizeof(char));
         strcpy(window.user.username, getenv("USERNAME"));
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        window.user.username = (char *)malloc(sizeof(char) * strlen(getenv("USER")));
+        usernamesize = (sizeof(char) * (strlen(getenv("USER")) + 1) );
+        window.user.username = (char *)calloc(usernamesize, sizeof(char));
         strcpy(window.user.username, getenv("USER"));
     #endif
+    window.user.username[usernamesize] = '\0';
 
     if (window.user.username == NULL)
     {
-        std::cout << "Failed heap allocation ! Cannot store user name !" << std::endl;
+        char errorString[255];
+        strcpy(errorString, window.user.path);
+        strcat(errorString, "Heap allocation error: Cannot store username. Exiting.");
+
+        QMessageBox::critical(nullptr, "Error", QString(errorString));
         exit(1);
     }
 
-    char* buf = new char[100];
+    //Seed RNG with username
+    srand(GetSeed(window.user.username));
+
+    //Check if directory exists && we have read/write access to it
+    if (IsDir() != 0)
+    {
+        char errorString[255];
+        strcpy(errorString, window.user.path);
+        strcat(errorString, " is not a user-writable directory !\nCheck if you have read/write permissions in its parent folder.");
+
+        QMessageBox::critical(nullptr, "Error", QString(errorString));
+        exit(1);
+    }
+
+    //Setting up database path
+    size_t pathsize;
     #if (defined (_WIN32) || defined (_WIN64))
-        strcpy(buf, getenv("USERPROFILE"));
-        strcat(buf, "\\Documents\\passwordmanager\\.passwords");
+        pathsize = (sizeof(char) * (strlen(getenv("APPDATA")) + strlen("\\passwordmanager\\passwords.db") + 1) );
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        strcpy(buf, getenv("HOME"));
-        strcat(buf, "/.passwordmanager/passwords");
+        pathsize = (sizeof(char) * (strlen(getenv("HOME") + strlen("/.passwordmanager/passwords.db") + 1) );
     #endif
 
-    window.user.path = (char *)malloc(sizeof(char) * (strlen(buf) + 1));
+    window.user.path = (char *)calloc(pathsize, sizeof(char));
+
+    #if (defined (_WIN32) || defined (_WIN64))
+        strcpy(window.user.path, getenv("APPDATA"));
+        strcat(window.user.path, "\\passwordmanager\\passwords.db");
+    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        strcpy(window.user.path, getenv("HOME"));
+        strcat(window.user.path, "/.passwordmanager/passwords.db");
+    #endif
+
+    window.user.path[pathsize] = '\0';
 
     if (window.user.path == NULL)
     {
-        std::cout << "Failed heap allocation ! Cannot store file path !" << std::endl;
+        char errorString[255];
+        strcpy(errorString, window.user.path);
+        strcat(errorString, "Heap allocation error: Cannot store path to database file. Exiting.");
+
+        QMessageBox::critical(nullptr, "Error", QString(errorString));
         exit(1);
-    }
-
-    strcpy(window.user.path, buf);
-    delete[] buf;
-    window.user.path[strlen(window.user.path)] = '\0';
-
-    //Check if directory really exists at user.path
-    struct stat info;
-
-    char temppath[255];
-    #if (defined (_WIN32) || defined (_WIN64))
-        strcpy(temppath, getenv("USERPROFILE"));
-        strcat(temppath, "\\Documents\\passwordmanager");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        strcpy(temppath, getenv("HOME"));
-        strcat(temppath, "/.passwordmanager");
-    #endif
-
-    if (stat(temppath, &info) == 0)
-    {
-        if (info.st_mode & S_IFDIR)
-        {
-            //Means everything is fine. No need to do anything here.
-        }
-        else
-        {
-            char errorString[255];
-            strcpy(errorString, window.user.path);
-            strcat(errorString, " is not a user-writable directory !\nCheck if you have read/write permissions in its parent folder.");
-
-            QMessageBox::critical(nullptr, "Error", QString(errorString));
-            return 1;
-        }
-    }
-    else
-    {
-        #if (defined (_WIN32) || defined (_WIN64))
-            CreateDirectoryA(temppath, NULL);
-        #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-            mkdir(temppath, S_IRWXU);
-            chmod(temppath, S_IRWXU);
-        #endif
     }
 
     //Setting up the database array

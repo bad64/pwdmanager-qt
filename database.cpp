@@ -11,8 +11,13 @@ DBRow *MainWindow::ReadFromFile()
     if (!file)
     {
         file.open(user.path, ios::out);
+        cout << "Created database at " << user.path << endl;
         file.close();
         file.open(user.path, ios::in);
+    }
+    else
+    {
+        cout << "Database located at " << user.path << endl;
     }
 
     string line;
@@ -27,7 +32,7 @@ DBRow *MainWindow::ReadFromFile()
         exit(1);
     }
     else
-        cout << lines << " lines read" << endl;
+        cout << "Retrieved " << lines << " entries" << endl;
 
     file.close();
     file.open(user.path, ios::in);
@@ -84,15 +89,22 @@ void MainWindow::WriteToFile()
 
 void MainWindow::Import()
 {
-    char* buf = new char[255];
+    char* buf;
+    size_t buffersize;
     #if (defined (_WIN32) || defined (_WIN64))
+        buffersize = sizeof(char) * (strlen(getenv("USERPROFILE")) + strlen("\\Documents") + 1);
+        buf = (char *)calloc(buffersize, sizeof(char));
         strcpy(buf, getenv("USERPROFILE"));
         strcat(buf, "\\Documents");
+        buf[buffersize] = '\0';
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        buffersize = sizeof(char) * strlen(getenv("HOME")
+        buf = (char *)calloc(buffersize, sizeof(char));
         strcpy(buf, getenv("HOME"));
+        buf[buffersize] = '\0';
     #endif
 
-    QString filepath = QFileDialog::getOpenFileName(this, "Export", QString(buf));
+    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf));
 
     if (filepath.isEmpty())
         return;
@@ -117,12 +129,19 @@ void MainWindow::Import()
 
 void MainWindow::Export()
 {
-    char* buf = new char[255];
+    char* buf;
+    size_t buffersize;
     #if (defined (_WIN32) || defined (_WIN64))
+        buffersize = sizeof(char) * (strlen(getenv("USERPROFILE")) + strlen("\\Documents") + 1);
+        buf = (char *)calloc(buffersize, sizeof(char));
         strcpy(buf, getenv("USERPROFILE"));
         strcat(buf, "\\Documents");
+        buf[buffersize] = '\0';
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        buffersize = sizeof(char) * strlen(getenv("HOME")
+        buf = (char *)calloc(buffersize, sizeof(char));
         strcpy(buf, getenv("HOME"));
+        buf[buffersize] = '\0';
     #endif
 
     QString filepath = QFileDialog::getSaveFileName(this, "Export", QString(buf));

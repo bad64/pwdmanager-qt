@@ -5,20 +5,8 @@ int randint(int minvalue, int maxvalue)
     return rand() % (maxvalue+1-minvalue) + minvalue;
 }
 
-unsigned long GetSeed()
+unsigned long GetSeed(char* username)
 {
-    //All this is just to guarantee better seed variety without going through an implementation of an already existing RNG engine
-    //I know it is a fair bit asinine, but I thought I'd try
-
-    char* username;
-    #if (defined (_WIN32) || defined (_WIN64))
-        username = (char *)malloc(sizeof(char) * strlen(getenv("USERNAME")));
-    	strcpy(username, getenv("USERNAME"));
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        username = (char *)malloc(sizeof(char) * strlen(getenv("USER")));
-	    strcpy(username, getenv("USER"));
-    #endif
-
     char *ptr;
     unsigned int hash = strtoul(username, &ptr, 36);
     unsigned int programStart = time(NULL);

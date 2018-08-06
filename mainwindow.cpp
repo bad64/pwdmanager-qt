@@ -143,10 +143,16 @@ void MainWindow::RefreshView()
     }
     else
     {
+        QRegularExpression regex(searchbox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
+
         int j = 0;
         for (unsigned int i = 0; i < lines; i++)
         {
-            if ((QString::compare(searchbox->text(), db[i].username) == 0) || (QString::compare(searchbox->text(), db[i].purpose) == 0) || (QString::compare(searchbox->text(), db[i].password) == 0))
+            QRegularExpressionMatch usernameMatch = regex.match(db[i].username);
+            QRegularExpressionMatch purposeMatch = regex.match(db[i].purpose);
+            QRegularExpressionMatch passwordMatch = regex.match(db[i].password);
+
+            if ((usernameMatch.hasMatch()) || (purposeMatch.hasMatch()) || (passwordMatch.hasMatch()))
             {
                 table->insertRow(table->rowCount());
 

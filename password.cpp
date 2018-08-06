@@ -36,7 +36,7 @@ const char* MainWindow::Generate()
     if (qSpecial == QMessageBox::Yes)
         requireSpecial = true;
 
-    char* password = (char *)malloc(sizeof(char) * (length+1));
+    char* password = (char *)calloc(length+1, sizeof(char));
 
     //Now we actually generate the password
     do
@@ -91,21 +91,51 @@ void MainWindow::NewEntry()
     if (proceed == false)
         return;
 
+    if (unamebuf.isEmpty())
+        unamebuf = QString("<none>");
+
+    int purposeLoop;
     do
     {
         prbuf = QInputDialog::getText(this, "Enter reason", "Please enter what these credentials will be used for:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
         if (proceed == false)
             return;
 
-    }while (strcmp(prbuf.toStdString().c_str(), "") == 0);
+        if (prbuf.isEmpty())
+        {
+            purposeLoop = QMessageBox::warning(this, "Warning", "Are you sure you do not wish to specify what these credentials are for ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        }
+        else
+            purposeLoop = QMessageBox::Yes;
 
-    needsGeneration = QMessageBox::question(this, "Password Generation", "Shall the software generate a password ?", QMessageBox::Yes | QMessageBox::No);
+    }while (purposeLoop != QMessageBox::Yes);
+
+    if (prbuf.isEmpty())
+        prbuf = QString("<none>");
+
+    needsGeneration = QMessageBox::question(this, "Password Generation", "Shall the software generate a password ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
     if (needsGeneration == QMessageBox::No)
     {
-        pwdbuf = QInputDialog::getText(this, "Enter password", "Please enter the password that will be stored:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
-        if (proceed == false)
-            return;
+        int passwordLoop;
+
+        do
+        {
+            pwdbuf = QInputDialog::getText(this, "Enter password", "Please enter the password that will be stored:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
+            if (proceed == false)
+                return;
+
+            if (pwdbuf.isEmpty())
+            {
+                passwordLoop = QMessageBox::warning(this, "Warning", "Are you sure you want an empty password ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            }
+            else
+                passwordLoop = QMessageBox::Yes;
+
+        }while (passwordLoop != QMessageBox::Yes);
+
+        if (pwdbuf.isEmpty())
+            pwdbuf = QString("<none>");
     }
     else
     {
@@ -123,19 +153,19 @@ void MainWindow::NewEntry()
 
     DBRow* temp = db;
 
-    db = (DBRow *)malloc(sizeof(DBRow) * (lines+1));
+    db = (DBRow *)calloc(lines+1, sizeof(DBRow));
     for (unsigned int i = 0; i < lines; i++)
         db[i] = temp[i];
 
     db[lines].id = id;
 
-    db[lines].username = (char *)malloc(sizeof(DBRow) * (strlen(unamebuf.toStdString().c_str())+1));
+    db[lines].username = (char *)calloc((strlen(unamebuf.toStdString().c_str())+1), sizeof(char));
     strcpy(db[lines].username, unamebuf.toStdString().c_str());
 
-    db[lines].purpose = (char *)malloc(sizeof(DBRow) * (strlen(prbuf.toStdString().c_str())+1));
+    db[lines].purpose = (char *)calloc((strlen(prbuf.toStdString().c_str())+1), sizeof(char));
     strcpy(db[lines].purpose, prbuf.toStdString().c_str());
 
-    db[lines].password = (char *)malloc(sizeof(DBRow) * (strlen(pwdbuf.toStdString().c_str())+1));
+    db[lines].password = (char *)calloc((strlen(pwdbuf.toStdString().c_str())+1), sizeof(char));
     strcpy(db[lines].password, pwdbuf.toStdString().c_str());
 
     lines++;
