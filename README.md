@@ -17,7 +17,7 @@ Lots.
 
 **NEW FEATURES**
 
-- Now accepts zero-length input (replaced by the string "<none>") for all three fields when adding a new entry
+- Now accepts zero-length input (replaced by the string "\<none\>") for all three fields when adding a new entry
 - Search bar has been improved, now allows for partial pattern matching ("test" finally matches both "testing" and "latest")
 
 **BUGFIXES**
