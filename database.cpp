@@ -246,6 +246,15 @@ void MainWindow::Edit()
            break;
        }
 
+       if (strcmp(db[i].username, "") == 0)
+           strcpy(db[i].username, "<none>");
+
+       if (strcmp(db[i].purpose, "") == 0)
+           strcpy(db[i].purpose, "<none>");
+
+       if (strcmp(db[i].password, "") == 0)
+           strcpy(db[i].password, "<none>");
+
        if (proceed == false)
            return;
     }

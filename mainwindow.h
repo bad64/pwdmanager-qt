@@ -19,24 +19,35 @@ public:
 public slots:
     DBRow* ReadFromFile();
     void WriteToFile();
+
     void Import();
     void Export();
     void Backup();
 
     void RefreshView();
+    void Search();
+
     void NewEntry();
     void Delete();
     void Edit();
     void Copy();
-    const char *Generate();
+
+    const char* Generate();
+
     void Help();
     void About();
 
 private:
+    QGridLayout* mainLayout;
     QTableWidget* table;
-    QTableWidget* searchresults;
-    QLabel* sboxlabel;
-    QLineEdit* searchbox;
+
+    QFrame* searchBoxFrame;
+    QVBoxLayout* searchBoxLayout;
+    QLabel* searchBoxLabel;
+    QLineEdit* searchBox;
+
+    QFrame* buttonsFrame;
+    QGridLayout* buttonsLayout;
     QPushButton* newButton;
     QPushButton* deleteButton;
     QPushButton* editButton;

@@ -36,6 +36,7 @@ const char* MainWindow::Generate()
     if (qSpecial == QMessageBox::Yes)
         requireSpecial = true;
 
+    generation:
     char* password = (char *)calloc(length+1, sizeof(char));
 
     //Now we actually generate the password
@@ -73,6 +74,13 @@ const char* MainWindow::Generate()
         password[length] = '\0';
 
     } while(strlen(password) < length);
+
+    //Check if password already exists in the db (unlikely, but might as well)
+    for (unsigned int i = 0; i < lines; i++)
+    {
+        if (strcmp(password, db[i].password) == 0)
+            goto generation;
+    }
 
     return password;
 }

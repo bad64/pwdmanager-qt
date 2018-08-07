@@ -56,7 +56,7 @@ MainWindow::MainWindow()
         QObject::connect(actionAbout, SIGNAL(triggered()), this, SLOT(About()));
 
     //Main layout
-    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout = new QGridLayout;
 
     //Table holding contents of passwords file
     table = new QTableWidget(0, 4);
@@ -65,17 +65,34 @@ MainWindow::MainWindow()
     table->horizontalHeader()->setStretchLastSection(true);
     table->setColumnWidth(0, 50);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(table, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(CustomMenuRequest(QPoint)));
     QObject::connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Edit()));
 
-    //Widgets for the right bar
-    sboxlabel = new QLabel("Search:");
-    sboxlabel->setContentsMargins(0,0,0,0);
+    //Search box
+    searchBoxFrame = new QFrame(this);
+    searchBoxFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+    searchBoxFrame->setLineWidth(0);
 
-    searchbox = new QLineEdit();
-    searchbox->setMinimumSize(150, 25);
-    searchbox->setMaximumHeight(25);
-    searchbox->setContentsMargins(0,0,0,0);
-    QObject::connect(searchbox, SIGNAL(textChanged(QString)), this, SLOT(RefreshView()));
+    searchBoxLayout = new QVBoxLayout;
+
+    searchBoxLabel = new QLabel("Search:");
+    searchBoxLabel->setContentsMargins(0,0,0,0);
+
+    searchBox = new QLineEdit();
+    searchBox->setMinimumSize(150, 25);
+    searchBox->setMaximumHeight(25);
+    searchBox->setContentsMargins(0,0,0,0);
+    QObject::connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(Search()));
+
+    searchBoxLayout->addWidget(searchBoxLabel);
+    searchBoxLayout->addWidget(searchBox);
+
+    searchBoxFrame->setLayout(searchBoxLayout);
+
+    //Button box
+    buttonsFrame = new QFrame(this);
+    buttonsLayout = new QGridLayout;
 
     newButton = new QPushButton("New Entry");
     newButton->setMinimumSize(100, 25);
@@ -93,14 +110,17 @@ MainWindow::MainWindow()
     copyButton->setMinimumSize(100, 25);
     QObject::connect(copyButton, SIGNAL(clicked(bool)), this, SLOT(Copy()));
 
+    buttonsLayout->addWidget(newButton, 0, 0);
+    buttonsLayout->addWidget(deleteButton, 0, 1);
+    buttonsLayout->addWidget(editButton, 1, 0);
+    buttonsLayout->addWidget(copyButton, 1, 1);
+
+    buttonsFrame->setLayout(buttonsLayout);
+
     //Piece it all together
     mainLayout->addWidget(table, 0, 0, 10, 7);
-    mainLayout->addWidget(sboxlabel, 0, 7, 1, 2);
-    mainLayout->addWidget(searchbox, 1, 7, 1, 2);
-    mainLayout->addWidget(newButton, 3, 7, 1, 1);
-    mainLayout->addWidget(deleteButton, 3, 8, 1, 1);
-    mainLayout->addWidget(editButton, 4, 7, 1, 1);
-    mainLayout->addWidget(copyButton, 4, 8, 1, 1);
+    mainLayout->addWidget(searchBoxFrame, 0, 7, 1, 2);
+    mainLayout->addWidget(buttonsFrame, 1, 7, 2, 2);
 
     this->centralWidget()->setLayout(mainLayout);
 
@@ -129,7 +149,22 @@ void MainWindow::RefreshView()
 
     table->setRowCount(0);
 
-    if (searchbox->text().isEmpty())
+    for (unsigned int i = 0; i < lines; i++)
+    {
+        table->insertRow(table->rowCount());
+
+        table->setItem(i, 0, new QTableWidgetItem(QString::number(db[i].id)));
+        table->setItem(i, 1, new QTableWidgetItem(db[i].username));
+        table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
+        table->setItem(i, 3, new QTableWidgetItem(db[i].password));
+    }
+}
+
+void MainWindow::Search()
+{
+    table->setRowCount(0);
+
+    if (searchBox->text().isEmpty())
     {
         for (unsigned int i = 0; i < lines; i++)
         {
@@ -143,7 +178,7 @@ void MainWindow::RefreshView()
     }
     else
     {
-        QRegularExpression regex(searchbox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
+        QRegularExpression regex(searchBox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
 
         int j = 0;
         for (unsigned int i = 0; i < lines; i++)
