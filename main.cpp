@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     #if (defined (_WIN32) || defined (_WIN64))
         pathsize = (sizeof(char) * (strlen(getenv("APPDATA")) + strlen("\\passwordmanager\\passwords.db") + 1) );
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        pathsize = (sizeof(char) * (strlen(getenv("HOME") + strlen("/.passwordmanager/passwords.db") + 1) );
+        pathsize = (sizeof(char) * (strlen(getenv("HOME")) + strlen("/.passwordmanager/passwords.db") + 1) );
     #endif
 
     window.user.path = (char *)calloc(pathsize, sizeof(char));

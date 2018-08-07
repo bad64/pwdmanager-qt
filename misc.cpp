@@ -32,7 +32,7 @@ int IsDir() //Not part of the MainWindow namespace
     #if (defined (_WIN32) || defined (_WIN64))
         temppathsize = (sizeof(char) * (strlen(getenv("APPDATA")) + strlen("\\passwordmanager") + 1) );
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        pathsize = (sizeof(char) * (strlen(getenv("HOME")) + strlen("\\passwordmanager") + 1) );
+        temppathsize = (sizeof(char) * (strlen(getenv("HOME")) + strlen("\\passwordmanager") + 1) );
     #endif
 
     temppath = (char *)calloc(temppathsize, sizeof(char));

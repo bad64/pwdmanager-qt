@@ -79,7 +79,7 @@ const char* MainWindow::Generate()
     for (unsigned int i = 0; i < lines; i++)
     {
         if (strcmp(password, db[i].password) == 0)
-            goto generation;
+            goto generation;    //Behold, one of the few acceptable cases for using goto
     }
 
     return password;

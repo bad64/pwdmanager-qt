@@ -98,7 +98,7 @@ void MainWindow::Import()
         strcat(buf, "\\Documents");
         buf[buffersize] = '\0';
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        buffersize = sizeof(char) * strlen(getenv("HOME")
+        buffersize = sizeof(char) * strlen(getenv("HOME"));
         buf = (char *)calloc(buffersize, sizeof(char));
         strcpy(buf, getenv("HOME"));
         buf[buffersize] = '\0';
@@ -138,7 +138,7 @@ void MainWindow::Export()
         strcat(buf, "\\Documents");
         buf[buffersize] = '\0';
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        buffersize = sizeof(char) * strlen(getenv("HOME")
+        buffersize = sizeof(char) * strlen(getenv("HOME"));
         buf = (char *)calloc(buffersize, sizeof(char));
         strcpy(buf, getenv("HOME"));
         buf[buffersize] = '\0';
