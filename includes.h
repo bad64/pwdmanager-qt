@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define VERSION "1.10"
+#define VERSION "1.11"
 
 //Qt
 #include <QtWidgets>
