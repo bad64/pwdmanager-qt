@@ -6,7 +6,7 @@ MainWindow::MainWindow()
     setCentralWidget(mainArea);
 
     //Prepping the database
-    db = (DBRow *)malloc(0);
+    db = (DBRow *)calloc(0, sizeof(DBRow));
     lines = 0;
 
     //Menu bar
@@ -65,8 +65,6 @@ MainWindow::MainWindow()
     table->horizontalHeader()->setStretchLastSection(true);
     table->setColumnWidth(0, 50);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    table->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(table, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(CustomMenuRequest(QPoint)));
     QObject::connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Edit()));
 
     //Search box
@@ -117,10 +115,22 @@ MainWindow::MainWindow()
 
     buttonsFrame->setLayout(buttonsLayout);
 
+    //Other
+    statusFrame = new QFrame(this);
+    statusFrame->setLineWidth(0);
+    statusLayout = new QVBoxLayout;
+
+    status = new QLabel("This should change", statusFrame);
+    status->setContentsMargins(0,0,0,0);
+
+    statusLayout->addWidget(status);
+    statusFrame->setLayout(statusLayout);
+
     //Piece it all together
     mainLayout->addWidget(table, 0, 0, 10, 7);
     mainLayout->addWidget(searchBoxFrame, 0, 7, 1, 2);
     mainLayout->addWidget(buttonsFrame, 1, 7, 2, 2);
+    mainLayout->addWidget(statusFrame, 9, 8);
 
     this->centralWidget()->setLayout(mainLayout);
 
@@ -141,6 +151,11 @@ void MainWindow::Init()
         table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
         table->setItem(i, 3, new QTableWidgetItem(db[i].password));
     }
+
+    std::stringstream statusbuffer;
+    statusbuffer << "Retrieved " << lines << " entries.";
+
+    status->setText(QString(statusbuffer.str().c_str()));
 }
 
 void MainWindow::RefreshView()
@@ -158,6 +173,11 @@ void MainWindow::RefreshView()
         table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
         table->setItem(i, 3, new QTableWidgetItem(db[i].password));
     }
+
+    std::stringstream statusbuffer;
+    statusbuffer << "Retrieved " << lines << " entries." << std::endl;
+
+    status->setText(QString(statusbuffer.str().c_str()));
 }
 
 void MainWindow::Search()

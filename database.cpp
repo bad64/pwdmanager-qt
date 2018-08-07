@@ -11,13 +11,13 @@ DBRow *MainWindow::ReadFromFile()
     if (!file)
     {
         file.open(user.path, ios::out);
-        cout << "Created database at " << user.path << endl;
+        //cout << "Created database at " << user.path << endl;
         file.close();
         file.open(user.path, ios::in);
     }
     else
     {
-        cout << "Database located at " << user.path << endl;
+        //cout << "Database located at " << user.path << endl;
     }
 
     string line;
@@ -25,14 +25,16 @@ DBRow *MainWindow::ReadFromFile()
     while(getline(file, line))
         lines++;
 
-    DBRow* db = (DBRow *)malloc(sizeof(DBRow) * lines);
+    DBRow* db = (DBRow *)calloc(lines, sizeof(DBRow));
     if (db == NULL)
     {
         cout << "Heap allocation failed !" << endl;
         exit(1);
     }
     else
-        cout << "Retrieved " << lines << " entries" << endl;
+    {
+        //cout << "Retrieved " << lines << " entries" << endl;
+    }
 
     file.close();
     file.open(user.path, ios::in);
@@ -51,19 +53,19 @@ DBRow *MainWindow::ReadFromFile()
         pos = line.find(delimiter, pos) + 1;
 
         token = line.substr(pos, line.find(delimiter, pos)-pos);
-        buffer.username = (char *)malloc(strlen(token.c_str())+1);
+        buffer.username = (char *)calloc(strlen(token.c_str())+1, sizeof(char));
         strcpy(buffer.username, token.c_str());
         buffer.username[strlen(buffer.username)] = '\0';
         pos = line.find(delimiter, pos) + 1;
 
         token = line.substr(pos, line.find(delimiter, pos)-pos);
-        buffer.purpose = (char *)malloc(strlen(token.c_str())+1);
+        buffer.purpose = (char *)calloc(strlen(token.c_str())+1, sizeof(char));
         strcpy(buffer.purpose, token.c_str());
         buffer.purpose[strlen(buffer.purpose)] = '\0';
         pos = line.find(delimiter, pos) + 1;
 
         token = line.substr(pos, line.find(delimiter, pos)-pos);
-        buffer.password = (char *)malloc(strlen(token.c_str())+1);
+        buffer.password = (char *)calloc(strlen(token.c_str())+1, sizeof(char));
         strcpy(buffer.password, token.c_str());
         buffer.password[strlen(buffer.password)] = '\0';
         pos = line.find(delimiter, pos) + 1;
@@ -189,7 +191,7 @@ void MainWindow::Delete()
         {
             unsigned int i = table->selectionModel()->currentIndex().row();
 
-            DBRow* temparray = (DBRow *)malloc(sizeof(DBRow) * (lines-1));
+            DBRow* temparray = (DBRow *)calloc(lines-1, sizeof(DBRow));
 
             int k = 0;
             for (unsigned int j = 0; j < lines; j++)

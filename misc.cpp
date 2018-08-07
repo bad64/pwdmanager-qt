@@ -52,7 +52,7 @@ int IsDir() //Not part of the MainWindow namespace
         if (info.st_mode & S_IFDIR)
         {
             //Means everything is fine. No need to do anything here.
-            std::cout << "Opened directory at " << temppath << std::endl;
+            //std::cout << "Opened directory at " << temppath << std::endl;
         }
         else
         {

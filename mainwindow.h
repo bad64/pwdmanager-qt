@@ -52,6 +52,10 @@ private:
     QPushButton* deleteButton;
     QPushButton* editButton;
     QPushButton* copyButton;
+
+    QFrame* statusFrame;
+    QVBoxLayout* statusLayout;
+    QLabel* status;
 };
 
 #endif // MAINWINDOW_H
