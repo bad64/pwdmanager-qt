@@ -87,6 +87,11 @@ void MainWindow::WriteToFile()
     }
 
     file.close();
+
+    std::stringstream statusbuffer;
+    statusbuffer << "Wrote " << lines << " entries.";
+
+    status->setText(QString(statusbuffer.str().c_str()));
 }
 
 void MainWindow::Import()
@@ -156,6 +161,11 @@ void MainWindow::Export()
     }
 
     file.close();
+
+    std::stringstream statusbuffer;
+    statusbuffer << "Exported database to " << filepath.toStdString().c_str() << ".";
+
+    status->setText(QString(statusbuffer.str().c_str()));
 }
 
 void MainWindow::Backup()
@@ -271,14 +281,14 @@ void MainWindow::Copy()
 
     if (selection->hasSelection())
     {
-       int i = table->selectionModel()->currentIndex().row();
+        int i = table->selectionModel()->currentIndex().row();
 
-       QClipboard* clipboard = QApplication::clipboard();
-       clipboard->setText(QString(table->model()->data(table->model()->index(i, 3)).toString()));
+        QClipboard* clipboard = QApplication::clipboard();
+        clipboard->setText(QString(table->model()->data(table->model()->index(i, 3)).toString()));
 
-       stringstream infotext;
-       infotext << "Copied password from row " << i+1 << " to clipboard !" << endl;
+        stringstream statusbuffer;
+        statusbuffer << "Copied password from row " << i+1 << " to clipboard";
 
-       QMessageBox::information(this, "Information", infotext.str().c_str());
+        status->setText(QString(statusbuffer.str().c_str()));
     }
 }

@@ -3,6 +3,7 @@
 MainWindow::MainWindow()
 {
     QWidget* mainArea = new QWidget;
+    QWidget::setWindowTitle("Password Manager");
     setCentralWidget(mainArea);
 
     //Prepping the database
@@ -121,6 +122,7 @@ MainWindow::MainWindow()
     statusLayout = new QVBoxLayout;
 
     status = new QLabel("This should change", statusFrame);
+    status->setAlignment(Qt::AlignRight);
     status->setContentsMargins(0,0,0,0);
 
     statusLayout->addWidget(status);
@@ -130,7 +132,7 @@ MainWindow::MainWindow()
     mainLayout->addWidget(table, 0, 0, 10, 7);
     mainLayout->addWidget(searchBoxFrame, 0, 7, 1, 2);
     mainLayout->addWidget(buttonsFrame, 1, 7, 2, 2);
-    mainLayout->addWidget(statusFrame, 9, 8);
+    mainLayout->addWidget(statusFrame, 9, 7, 1, 2);
 
     this->centralWidget()->setLayout(mainLayout);
 
@@ -173,11 +175,6 @@ void MainWindow::RefreshView()
         table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
         table->setItem(i, 3, new QTableWidgetItem(db[i].password));
     }
-
-    std::stringstream statusbuffer;
-    statusbuffer << "Retrieved " << lines << " entries." << std::endl;
-
-    status->setText(QString(statusbuffer.str().c_str()));
 }
 
 void MainWindow::Search()
@@ -195,6 +192,11 @@ void MainWindow::Search()
             table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
             table->setItem(i, 3, new QTableWidgetItem(db[i].password));
         }
+
+        std::stringstream statusbuffer;
+        statusbuffer << "Retrieved " << lines << " entries.";
+
+        status->setText(QString(statusbuffer.str().c_str()));
     }
     else
     {
@@ -218,5 +220,10 @@ void MainWindow::Search()
                 j++;
             }
         }
+
+        std::stringstream statusbuffer;
+        statusbuffer << "Found " << table->rowCount() << " matches.";
+
+        status->setText(QString(statusbuffer.str().c_str()));
     }
 }
