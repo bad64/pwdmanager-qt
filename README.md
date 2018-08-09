@@ -32,5 +32,5 @@ Lots.
 
 # Download links
 
-Windows: [pwdmanager-qt-v1.11-windows.zip](https://github.com/bad64/pwdmanager-qt/files/2274152/pwdmanager-qt-v1.11-windows.zip)  
+Windows: [pwdmanager-qt-v1.11-windows.zip](https://github.com/bad64/pwdmanager-qt/files/2274684/pwdmanager-qt-v1.11-windows.zip)   
 Linux: [pwdmanager-qt-v1.11-linux.zip](https://github.com/bad64/pwdmanager-qt/files/2274212/pwdmanager-qt-v1.11-linux.zip)
