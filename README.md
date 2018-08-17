@@ -28,6 +28,7 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 **TO DO**
 
 - Maybe an icon ?
+- Translations, at least a French one
 
 # Download links
 
