@@ -4,7 +4,7 @@ A large(ish) rework of my console-only multiplatform password manager that you c
 
 Made with Qt 5.10. It has a couple more functions than its console counterpart, like editing database rows, or cross-platform copy to clipboard.
 
-# Latest update: v1.2, 17/08/18
+# Latest update: v1.21, 17/08/18
 
 **CHANGES FROM v1.0**
 
@@ -19,6 +19,7 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 - Now accepts zero-length input (replaced by the string "\<none\>") for all three fields when adding a new entry
 - Search bar has been improved, now allows for partial pattern matching ("test" finally matches both "testing" and "latest") and exact matching
+- Added French Localization
 
 **BUGFIXES**
 
@@ -28,9 +29,8 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 **TO DO**
 
 - Maybe an icon ?
-- Translations, at least a French one
 
 # Download links
 
-Windows: [pwdmanager-qt-v1.2-windows.zip](https://github.com/bad64/pwdmanager-qt/files/2296652/pwdmanager-qt-v1.2-windows.zip)  
-Linux: [pwdmanager-qt-v1.2-linux.zip](https://github.com/bad64/pwdmanager-qt/files/2296654/pwdmanager-qt-v1.2-linux.zip)
+Windows:   
+Linux:
