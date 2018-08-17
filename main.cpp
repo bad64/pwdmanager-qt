@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
 
     //Translating
     QString locale = QLocale::system().name().section('_', 0, 0);
+    std::cout << locale.toStdString() << std::endl;
 
     QTranslator translator;
     #if (defined (_WIN32) || defined (_WIN64))
