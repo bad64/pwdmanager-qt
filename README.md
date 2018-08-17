@@ -11,7 +11,7 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 - All: Changed database file extension to .db (trying to harmonize filenames between Windows and Linux)
 - All: Changed all malloc() calls to calloc() to improve stability (at the cost of slightly higher memory usage)
 - All: Help and About windows changed from QMessageBox::information to QMessageBox::about
-- All: Status report describing the results of last operation implementer in the bottom right corner
+- All: Status report describing the results of last operation implemented in the bottom right corner
 - All: Generally cleaned up the grid layout, resulting in a nicer-looking UI
 - Windows: Changed the storage destination to %AppData%\passwordmanager
 
