@@ -9,7 +9,11 @@ int main(int argc, char *argv[])
     QString locale = QLocale::system().name().section('_', 0, 0);
 
     QTranslator translator;
-    translator.load(QString("translations/pwdmanager-qt_") + locale);
+    #if (defined (_WIN32) || defined (_WIN64))
+        translator.load(QString("translations\\pwdmanager-qt_") + locale);
+    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        translator.load(QString("/usr/local/share/pwdmanager-qt/pwdmanager-qt_") + locale);
+    #endif
     app.installTranslator(&translator);
 
     MainWindow window;
