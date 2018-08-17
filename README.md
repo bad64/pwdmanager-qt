@@ -31,5 +31,5 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 # Download links
 
-Windows:  
-Linux: 
+Windows: [pwdmanager-qt-v1.2-windows.zip](https://github.com/bad64/pwdmanager-qt/files/2296652/pwdmanager-qt-v1.2-windows.zip)  
+Linux: [pwdmanager-qt-v1.2-linux.zip](https://github.com/bad64/pwdmanager-qt/files/2296654/pwdmanager-qt-v1.2-linux.zip)
