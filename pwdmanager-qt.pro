@@ -11,3 +11,6 @@ SOURCES += \
 HEADERS += \
     includes.h \
     mainwindow.h
+
+TRANSLATIONS += \
+    translations/pwdmanager-qt_fr.ts

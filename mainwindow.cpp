@@ -11,48 +11,48 @@ MainWindow::MainWindow()
     lines = 0;
 
     //Menu bar
-    QMenu* optionFile = menuBar()->addMenu("&File");
-        QAction* actionImport = new QAction("&Import", this);
+    QMenu* optionFile = menuBar()->addMenu(tr("&File"));
+        QAction* actionImport = new QAction(tr("Import"), this);
         optionFile->addAction(actionImport);
         QObject::connect(actionImport, SIGNAL(triggered()), this, SLOT(Import()));
 
-        QAction* actionExport = new QAction("&Export", this);
+        QAction* actionExport = new QAction(tr("Export"), this);
         optionFile->addAction(actionExport);
         QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(Export()));
 
-        QAction* actionRefresh = new QAction("&Refresh View", this);
+        QAction* actionRefresh = new QAction(tr("Refresh View"), this);
         actionRefresh->setShortcut(Qt::Key_F5);
         optionFile->addAction(actionRefresh);
         QObject::connect(actionRefresh, SIGNAL(triggered()), this, SLOT(RefreshView()));
 
-        QAction* actionQuit = new QAction("&Quit", this);
+        QAction* actionQuit = new QAction(tr("Quit"), this);
         optionFile->addAction(actionQuit);
         QObject::connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    QMenu* optionEdit = menuBar()->addMenu("&Edit");
-        QAction* actionNew = new QAction("&New row", this);
+    QMenu* optionEdit = menuBar()->addMenu(tr("&Edit"));
+        QAction* actionNew = new QAction(tr("New row"), this);
         optionEdit->addAction(actionNew);
         QObject::connect(actionNew, SIGNAL(triggered()), this, SLOT(NewEntry()));
 
-        QAction* actionDelete = new QAction("&Delete row", this);
+        QAction* actionDelete = new QAction(tr("Delete row"), this);
         optionEdit->addAction(actionDelete);
         QObject::connect(actionDelete, SIGNAL(triggered()), this, SLOT(Delete()));
 
-        QAction* actionEdit = new QAction("&Edit cell content", this);
+        QAction* actionEdit = new QAction(tr("Edit cell content"), this);
         optionEdit->addAction(actionEdit);
         QObject::connect(actionEdit, SIGNAL(triggered()), this, SLOT(Edit()));
 
-        QAction* actionCopy = new QAction("&Copy password", this);
+        QAction* actionCopy = new QAction(tr("Copy password"), this);
         optionEdit->addAction(actionCopy);
         QObject::connect(actionCopy, SIGNAL(triggered()), this, SLOT(Copy()));
 
-    QMenu* optionMisc = menuBar()->addMenu("&?");
-        QAction* actionHelp = new QAction("&Help", this);
+    QMenu* optionMisc = menuBar()->addMenu("?");
+        QAction* actionHelp = new QAction(tr("Help"), this);
         actionHelp->setShortcut(Qt::Key_F1);
         optionMisc->addAction(actionHelp);
         QObject::connect(actionHelp, SIGNAL(triggered()), this, SLOT(Help()));
 
-        QAction* actionAbout = new QAction("&About", this);
+        QAction* actionAbout = new QAction(tr("About"), this);
         optionMisc->addAction(actionAbout);
         QObject::connect(actionAbout, SIGNAL(triggered()), this, SLOT(About()));
 
@@ -61,7 +61,7 @@ MainWindow::MainWindow()
 
     //Table holding contents of passwords file
     table = new QTableWidget(0, 4);
-    table->setHorizontalHeaderLabels(QString("ID;USERNAME;USED FOR;PASSWORD").split(";"));
+    table->setHorizontalHeaderLabels(QString(tr("ID;USERNAME;USED FOR;PASSWORD")).split(";"));
     table->verticalHeader()->setVisible(false);
     table->horizontalHeader()->setStretchLastSection(true);
     table->setColumnWidth(0, 50);
@@ -75,7 +75,7 @@ MainWindow::MainWindow()
 
     searchBoxLayout = new QVBoxLayout;
 
-    searchBoxLabel = new QLabel("Search:");
+    searchBoxLabel = new QLabel(tr("Search:"));
     searchBoxLabel->setContentsMargins(0,0,0,0);
 
     searchBox = new QLineEdit();
@@ -84,7 +84,7 @@ MainWindow::MainWindow()
     searchBox->setContentsMargins(0,0,0,0);
     QObject::connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(Search()));
 
-    exactMatch = new QCheckBox("E&xact match", this);
+    exactMatch = new QCheckBox(tr("E&xact match"), this);
     exactMatch->setTristate(false);
     exactMatch->setCheckState(Qt::Unchecked);
     QObject::connect(exactMatch, SIGNAL(stateChanged(int)), this, SLOT(Search()));
@@ -99,19 +99,19 @@ MainWindow::MainWindow()
     buttonsFrame = new QFrame(this);
     buttonsLayout = new QGridLayout;
 
-    newButton = new QPushButton("New Entry");
+    newButton = new QPushButton(tr("New Entry"));
     newButton->setMinimumSize(100, 25);
     QObject::connect(newButton, SIGNAL(clicked(bool)), this, SLOT(NewEntry()));
 
-    deleteButton = new QPushButton("Delete");
+    deleteButton = new QPushButton(tr("Delete"));
     deleteButton->setMinimumSize(100, 25);
     QObject::connect(deleteButton, SIGNAL(clicked(bool)), this, SLOT(Delete()));
 
-    editButton = new QPushButton("Edit");
+    editButton = new QPushButton(tr("Edit"));
     editButton->setMinimumSize(100, 25);
     QObject::connect(editButton, SIGNAL(clicked(bool)), this, SLOT(Edit()));
 
-    copyButton = new QPushButton("Copy");
+    copyButton = new QPushButton(tr("Copy"));
     copyButton->setMinimumSize(100, 25);
     QObject::connect(copyButton, SIGNAL(clicked(bool)), this, SLOT(Copy()));
 
@@ -161,7 +161,13 @@ void MainWindow::Init()
     }
 
     std::stringstream statusbuffer;
-    statusbuffer << "Retrieved " << lines << " entries.";
+
+    if (lines == 0)
+        statusbuffer << tr("Retrieved 0 entries.").toStdString();
+    else if (lines == 1)
+        statusbuffer << tr("Retrieved 1 entry.").toStdString();
+    else
+        statusbuffer << tr("Retrieved ").toStdString() << lines << tr(" entries.").toStdString();
 
     status->setText(QString(statusbuffer.str().c_str()));
 }
@@ -200,7 +206,7 @@ void MainWindow::Search()
         }
 
         std::stringstream statusbuffer;        
-        statusbuffer << "Retrieved " << lines << " entries.";
+        statusbuffer << tr("Retrieved ").toStdString() << lines << tr(" entries.").toStdString();
 
         status->setText(QString(statusbuffer.str().c_str()));
     }
@@ -233,11 +239,11 @@ void MainWindow::Search()
             std::stringstream statusbuffer;
 
             if (table->rowCount() == 0)
-                statusbuffer << "No matches found.";
+                statusbuffer << tr("No matches found.").toStdString();
             else if (table->rowCount() == 1)
-                statusbuffer << "Found 1 match.";
+                statusbuffer << tr("Found 1 match.").toStdString();
             else
-                statusbuffer << "Found " << table->rowCount() << " matches.";
+                statusbuffer << tr("Found ").toStdString() << table->rowCount() << tr(" matches.").toStdString();
 
             status->setText(QString(statusbuffer.str().c_str()));
         }
@@ -262,11 +268,11 @@ void MainWindow::Search()
             std::stringstream statusbuffer;
 
             if (table->rowCount() == 0)
-                statusbuffer << "No matches found.";
+                statusbuffer << tr("No matches found.").toStdString();
             else if (table->rowCount() == 1)
-                statusbuffer << "Found 1 match.";
+                statusbuffer << tr("Found 1 match.").toStdString();
             else
-                statusbuffer << "Found " << table->rowCount() << " matches.";
+                statusbuffer << tr("Found ").toStdString() << table->rowCount() << tr(" matches.").toStdString();
 
             status->setText(QString(statusbuffer.str().c_str()));
         }

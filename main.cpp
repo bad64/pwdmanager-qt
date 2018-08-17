@@ -4,6 +4,14 @@ int main(int argc, char *argv[])
 {
     //Begin Qt
     QApplication app(argc, argv);
+
+    //Translating
+    QString locale = QLocale::system().name().section('_', 0, 0);
+
+    QTranslator translator;
+    translator.load(QString("translations/pwdmanager-qt_") + locale);
+    app.installTranslator(&translator);
+
     MainWindow window;
 
     //Setting up user struct, starting with username
@@ -22,7 +30,6 @@ int main(int argc, char *argv[])
     if (window.user.username == NULL)
     {
         char errorString[255];
-        strcpy(errorString, window.user.path);
         strcat(errorString, "Heap allocation error: Cannot store username. Exiting.");
 
         QMessageBox::critical(nullptr, "Error", QString(errorString));

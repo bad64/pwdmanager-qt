@@ -27,15 +27,15 @@ const char* MainWindow::Generate()
 
     //Qt stuff
     int intlimit = std::numeric_limits<int>::max();
-    length = QInputDialog::getInt(this, "Password generation", "Please enter the desired length of the password:", 10, 0, intlimit, 1, &proceed);
+    length = QInputDialog::getInt(this, tr("Password generation"), tr("Please enter the desired length of the password:"), 10, 0, intlimit, 1, &proceed);
     if (proceed == false)
     {
         return "";
     }
 
-    int qUppercase = QMessageBox::question(this, "Password Generation", "Does your password requires uppercase letters ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    int qNumeric = QMessageBox::question(this, "Password Generation", "Does your password requires numeric characters ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    int qSpecial = QMessageBox::question(this, "Password Generation", "Does your password requires special characters (i.e. non alphanumeric) ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    int qUppercase = QMessageBox::question(this, tr("Password Generation"), tr("Does your password requires uppercase letters ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    int qNumeric = QMessageBox::question(this, tr("Password Generation"), tr("Does your password requires numeric characters ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    int qSpecial = QMessageBox::question(this, tr("Password Generation"), tr("Does your password requires special characters (i.e. non alphanumeric) ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
     if (qUppercase == QMessageBox::Yes)
         requireUppercase = true;
@@ -105,7 +105,7 @@ void MainWindow::NewEntry()
     int needsGeneration = 0;
     bool proceed = true;
 
-    unamebuf = QInputDialog::getText(this, "Enter username", "Please enter the user name for this entry:", QLineEdit::Normal, QString(user.username), &proceed).toStdString().c_str();
+    unamebuf = QInputDialog::getText(this, tr("Enter username"), tr("Please enter the user name for this entry:"), QLineEdit::Normal, QString(user.username), &proceed).toStdString().c_str();
     if (proceed == false)
         return;
 
@@ -115,13 +115,13 @@ void MainWindow::NewEntry()
     int purposeLoop;
     do
     {
-        prbuf = QInputDialog::getText(this, "Enter reason", "Please enter what these credentials will be used for:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
+        prbuf = QInputDialog::getText(this, tr("Enter reason"), tr("Please enter what these credentials will be used for:"), QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
         if (proceed == false)
             return;
 
         if (prbuf.isEmpty())
         {
-            purposeLoop = QMessageBox::warning(this, "Warning", "Are you sure you do not wish to specify what these credentials are for ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            purposeLoop = QMessageBox::warning(this, tr("Warning"), tr("Are you sure you do not wish to specify what these credentials are for ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         }
         else
             purposeLoop = QMessageBox::Yes;
@@ -131,7 +131,7 @@ void MainWindow::NewEntry()
     if (prbuf.isEmpty())
         prbuf = QString("<none>");
 
-    needsGeneration = QMessageBox::question(this, "Password Generation", "Shall the software generate a password ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    needsGeneration = QMessageBox::question(this, tr("Password Generation"), tr("Shall the software generate a password ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
     if (needsGeneration == QMessageBox::No)
     {
@@ -139,13 +139,13 @@ void MainWindow::NewEntry()
 
         do
         {
-            pwdbuf = QInputDialog::getText(this, "Enter password", "Please enter the password that will be stored:", QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
+            pwdbuf = QInputDialog::getText(this, tr("Enter password"), tr("Please enter the password that will be stored:"), QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
             if (proceed == false)
                 return;
 
             if (pwdbuf.isEmpty())
             {
-                passwordLoop = QMessageBox::warning(this, "Warning", "Are you sure you want an empty password ?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+                passwordLoop = QMessageBox::warning(this, tr("Warning"), tr("Are you sure you want an empty password ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
             }
             else
                 passwordLoop = QMessageBox::Yes;

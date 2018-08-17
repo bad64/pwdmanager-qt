@@ -90,9 +90,9 @@ void MainWindow::WriteToFile()
 
     std::stringstream statusbuffer;
     if (lines == 1)
-        statusbuffer << "Wrote 1 entry.";
+        statusbuffer << tr("Wrote 1 entry.").toStdString();
     else
-        statusbuffer << "Wrote " << lines << " entries.";
+        statusbuffer << tr("Wrote ").toStdString() << lines << tr(" entries.").toStdString();
 
     status->setText(QString(statusbuffer.str().c_str()));
 }
@@ -106,7 +106,7 @@ void MainWindow::AppendToFile()
     file.close();
 
     std::stringstream statusbuffer;
-    statusbuffer << "Wrote 1 entry.";
+    statusbuffer << tr("Wrote 1 entry.").toStdString();
 
     status->setText(QString(statusbuffer.str().c_str()));
 }
@@ -133,8 +133,8 @@ void MainWindow::Import()
     if (filepath.isEmpty())
         return;
 
-    int areyousure = QMessageBox::warning(this, "Warning", "This will replace all entries in the current database with those of the imported database.\n"
-                                                           "This operation is not recoverable. Do you wish to proceed ?", QMessageBox::Yes | QMessageBox::No);
+    int areyousure = QMessageBox::warning(this, tr("Warning"), tr("This will replace all entries in the current database with those of the imported database.\n"
+                                                                    "This operation is not recoverable. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
 
     if (areyousure == QMessageBox::No)
         return;
@@ -180,7 +180,7 @@ void MainWindow::Export()
     file.close();
 
     std::stringstream statusbuffer;
-    statusbuffer << "Exported database to " << filepath.toStdString().c_str() << ".";
+    statusbuffer << tr("Exported database to ").toStdString() << filepath.toStdString().c_str() << ".";
 
     status->setText(QString(statusbuffer.str().c_str()));
 }
@@ -209,8 +209,8 @@ void MainWindow::Delete()
 
     if (selection->hasSelection())
     {
-       int areyousure = QMessageBox::warning(this, "Warning", "This will delete the entire row from the database.\n"
-                                                              "This operation is not recoverable. Do you wish to proceed ?", QMessageBox::Yes | QMessageBox::No);
+       int areyousure = QMessageBox::warning(this, tr("Warning"), tr("This will delete the entire row from the database.\n"
+                                                                        "This operation is not recoverable. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
 
         if (areyousure == QMessageBox::No)
             return;
@@ -271,13 +271,13 @@ void MainWindow::Edit()
        case 0:
            return;
        case 1:
-           db[i].username = (char *)QInputDialog::getText(this, "Edit", "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
+           db[i].username = (char *)QInputDialog::getText(this, tr("Edit"), "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
            break;
        case 2:
-           db[i].purpose = (char *)QInputDialog::getText(this, "Edit", "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
+           db[i].purpose = (char *)QInputDialog::getText(this, tr("Edit"), "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
            break;
        case 3:
-           db[i].password = (char *)QInputDialog::getText(this, "Edit", "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
+           db[i].password = (char *)QInputDialog::getText(this, tr("Edit"), "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
            break;
        }
 
@@ -310,7 +310,7 @@ void MainWindow::Copy()
         clipboard->setText(QString(table->model()->data(table->model()->index(i, 3)).toString()));
 
         stringstream statusbuffer;
-        statusbuffer << "Copied password from row " << i+1 << " to clipboard";
+        statusbuffer << tr("Copied password from row ").toStdString() << i+1 << tr(" to clipboard").toStdString();
 
         status->setText(QString(statusbuffer.str().c_str()));
     }
