@@ -32,6 +32,10 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 # Download links
 
-[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/1.21/pwdmanager-qt-v1.21-windows-setup.exe)  
-[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/1.21/pwdmanager-qt-v1.21-windows.zip)  
-[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/1.21/pwdmanager-qt-v1.21-linux.zip) (comes with an installation script that requires dialog)
+**WINDOWS**
+[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/v1.21/pwdmanager-qt-v1.21-windows-setup.exe)  
+[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v1.21/pwdmanager-qt-v1.21-windows.zip)
+
+**LINUX**
+Linux version depends on Qt5. Installer script itself requires dialog.
+[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v1.21/pwdmanager-qt-v1.21-linux.zip)
