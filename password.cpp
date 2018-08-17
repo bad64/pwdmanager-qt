@@ -5,7 +5,17 @@ const char* MainWindow::Generate()
     char lowercase[27] = "abcdefghijklmnopqrstuvwxyz";
     char uppercase[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char numeric[11] = "0123456789";
-    char special[] = "@&§!€ù$*";
+
+    char special[9];
+    special[0] = '@';
+    special[1] = '&';
+    special[2] = '+';
+    special[3] = '!';
+    special[4] = '_';
+    special[5] = '%';
+    special[6] = '$';
+    special[7] = '*';
+    special[8] = '\0';
 
     lowercase[26] = '\0';
     uppercase[26] = '\0';
@@ -147,7 +157,7 @@ void MainWindow::NewEntry()
     }
     else
     {
-        pwdbuf = Generate();
+        pwdbuf = QString::fromUtf8(Generate());
         if (strcmp(pwdbuf.toStdString().c_str(), "") == 0)
             return;
     }
@@ -178,6 +188,7 @@ void MainWindow::NewEntry()
 
     lines++;
 
-    WriteToFile();
+    //WriteToFile();
+    AppendToFile();
     RefreshView();
 }

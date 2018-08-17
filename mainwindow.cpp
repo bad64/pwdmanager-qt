@@ -84,8 +84,14 @@ MainWindow::MainWindow()
     searchBox->setContentsMargins(0,0,0,0);
     QObject::connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(Search()));
 
+    exactMatch = new QCheckBox("E&xact match", this);
+    exactMatch->setTristate(false);
+    exactMatch->setCheckState(Qt::Unchecked);
+    QObject::connect(exactMatch, SIGNAL(stateChanged(int)), this, SLOT(Search()));
+
     searchBoxLayout->addWidget(searchBoxLabel);
     searchBoxLayout->addWidget(searchBox);
+    searchBoxLayout->addWidget(exactMatch);
 
     searchBoxFrame->setLayout(searchBoxLayout);
 
@@ -193,37 +199,76 @@ void MainWindow::Search()
             table->setItem(i, 3, new QTableWidgetItem(db[i].password));
         }
 
-        std::stringstream statusbuffer;
+        std::stringstream statusbuffer;        
         statusbuffer << "Retrieved " << lines << " entries.";
 
         status->setText(QString(statusbuffer.str().c_str()));
     }
     else
     {
-        QRegularExpression regex(searchBox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
-
-        int j = 0;
-        for (unsigned int i = 0; i < lines; i++)
+        if (!exactMatch->isChecked())
         {
-            QRegularExpressionMatch usernameMatch = regex.match(db[i].username);
-            QRegularExpressionMatch purposeMatch = regex.match(db[i].purpose);
-            QRegularExpressionMatch passwordMatch = regex.match(db[i].password);
+            QRegularExpression regex(searchBox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
 
-            if ((usernameMatch.hasMatch()) || (purposeMatch.hasMatch()) || (passwordMatch.hasMatch()))
+            int j = 0;
+            for (unsigned int i = 0; i < lines; i++)
             {
-                table->insertRow(table->rowCount());
+                QRegularExpressionMatch usernameMatch = regex.match(db[i].username);
+                QRegularExpressionMatch purposeMatch = regex.match(db[i].purpose);
+                QRegularExpressionMatch passwordMatch = regex.match(db[i].password);
 
-                table->setItem(j, 0, new QTableWidgetItem(QString::number(db[i].id)));
-                table->setItem(j, 1, new QTableWidgetItem(db[i].username));
-                table->setItem(j, 2, new QTableWidgetItem(db[i].purpose));
-                table->setItem(j, 3, new QTableWidgetItem(db[i].password));
-                j++;
+                if ((usernameMatch.hasMatch()) || (purposeMatch.hasMatch()) || (passwordMatch.hasMatch()))
+                {
+                    table->insertRow(table->rowCount());
+
+                    table->setItem(j, 0, new QTableWidgetItem(QString::number(db[i].id)));
+                    table->setItem(j, 1, new QTableWidgetItem(db[i].username));
+                    table->setItem(j, 2, new QTableWidgetItem(db[i].purpose));
+                    table->setItem(j, 3, new QTableWidgetItem(db[i].password));
+                    j++;
+                }
             }
+
+            //Write query results to status
+            std::stringstream statusbuffer;
+
+            if (table->rowCount() == 0)
+                statusbuffer << "No matches found.";
+            else if (table->rowCount() == 1)
+                statusbuffer << "Found 1 match.";
+            else
+                statusbuffer << "Found " << table->rowCount() << " matches.";
+
+            status->setText(QString(statusbuffer.str().c_str()));
         }
+        else
+        {
+            int j = 0;
+            for (unsigned int i = 0; i < lines; i++)
+            {
+                if ((strcmp(searchBox->text().toStdString().c_str(), db[i].username) == 0) || (strcmp(searchBox->text().toStdString().c_str(), db[i].purpose) == 0) || (strcmp(searchBox->text().toStdString().c_str(), db[i].password) == 0))
+                {
+                    table->insertRow(table->rowCount());
 
-        std::stringstream statusbuffer;
-        statusbuffer << "Found " << table->rowCount() << " matches.";
+                    table->setItem(j, 0, new QTableWidgetItem(QString::number(db[i].id)));
+                    table->setItem(j, 1, new QTableWidgetItem(db[i].username));
+                    table->setItem(j, 2, new QTableWidgetItem(db[i].purpose));
+                    table->setItem(j, 3, new QTableWidgetItem(db[i].password));
+                    j++;
+                }
+            }
 
-        status->setText(QString(statusbuffer.str().c_str()));
+            //Write query results to status
+            std::stringstream statusbuffer;
+
+            if (table->rowCount() == 0)
+                statusbuffer << "No matches found.";
+            else if (table->rowCount() == 1)
+                statusbuffer << "Found 1 match.";
+            else
+                statusbuffer << "Found " << table->rowCount() << " matches.";
+
+            status->setText(QString(statusbuffer.str().c_str()));
+        }
     }
 }

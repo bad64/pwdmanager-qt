@@ -89,7 +89,24 @@ void MainWindow::WriteToFile()
     file.close();
 
     std::stringstream statusbuffer;
-    statusbuffer << "Wrote " << lines << " entries.";
+    if (lines == 1)
+        statusbuffer << "Wrote 1 entry.";
+    else
+        statusbuffer << "Wrote " << lines << " entries.";
+
+    status->setText(QString(statusbuffer.str().c_str()));
+}
+
+void MainWindow::AppendToFile()
+{
+    ofstream file(user.path, ios::app);
+
+    file << db[lines-1].id << "," << db[lines-1].username << "," << db[lines-1].purpose << "," << db[lines-1].password << ",\n";
+
+    file.close();
+
+    std::stringstream statusbuffer;
+    statusbuffer << "Wrote 1 entry.";
 
     status->setText(QString(statusbuffer.str().c_str()));
 }
@@ -201,8 +218,10 @@ void MainWindow::Delete()
         {
             unsigned int i = table->selectionModel()->currentIndex().row();
 
+            //Create db array of size n-1
             DBRow* temparray = (DBRow *)calloc(lines-1, sizeof(DBRow));
 
+            //Copy current db to temporary array except the line to be deleted
             int k = 0;
             for (unsigned int j = 0; j < lines; j++)
             {
@@ -213,19 +232,23 @@ void MainWindow::Delete()
                 }
             }
 
+            //Downsize actual db
             lines--;
-            db = (DBRow *)realloc(db, sizeof(DBRow) * lines);
+            db = (DBRow *)realloc(db, sizeof(DBRow) * lines);   //Realloc doesn't keep array contents, hence why we store the db in a temp array
 
+            //Copy back everything into the database
             for (unsigned int j = 0; j < lines; j++)
             {
                 db[j] = temparray[j];
             }
 
+            //Adjust row id starting from where the now deleted line used to be
             for (unsigned int j = i; j < lines; j++)
                 db[j].id--;
         }
     }
 
+    //Finally, write db to file and present view to the user
     WriteToFile();
     RefreshView();
 }

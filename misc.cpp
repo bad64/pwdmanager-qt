@@ -56,7 +56,6 @@ int IsDir() //Not part of the MainWindow namespace
         }
         else
         {
-            delete[] temppath;
             return 1;
         }
     }
@@ -72,6 +71,5 @@ int IsDir() //Not part of the MainWindow namespace
         std::cout << "Created operating directory at " << temppath << std::endl;
     }
 
-    delete[] temppath;
     return 0;
 }

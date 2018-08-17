@@ -19,6 +19,7 @@ public:
 public slots:
     DBRow* ReadFromFile();
     void WriteToFile();
+    void AppendToFile();
 
     void Import();
     void Export();
@@ -45,6 +46,7 @@ private:
     QVBoxLayout* searchBoxLayout;
     QLabel* searchBoxLabel;
     QLineEdit* searchBox;
+    QCheckBox* exactMatch;
 
     QFrame* buttonsFrame;
     QGridLayout* buttonsLayout;
