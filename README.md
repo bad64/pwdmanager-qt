@@ -4,27 +4,19 @@ A large(ish) rework of my console-only multiplatform password manager that you c
 
 Made with Qt 5.10. It has a couple more functions than its console counterpart, like editing database rows, or cross-platform copy to clipboard.
 
-# Latest update: v1.21, 17/08/18
+# Latest update: v2.0, 20/08/18
 
-**CHANGES FROM v1.0**
+**CHANGES FROM v1.21**
 
-- All: Changed database file extension to .db (trying to harmonize filenames between Windows and Linux)
-- All: Changed all malloc() calls to calloc() to improve stability (at the cost of slightly higher memory usage)
-- All: Help and About windows changed from QMessageBox::information to QMessageBox::about
-- All: Status report describing the results of last operation implemented in the bottom right corner
-- All: Generally cleaned up the grid layout, resulting in a nicer-looking UI
-- Windows: Changed the storage destination to %AppData%\passwordmanager
+- All: Downgraded Qt version to 5.7 for compatibility's sake (makes no change to the actual code)
+- All: Function naming convention has been changed from UpperCamelCase to camelCase
+- All: New subwindow facilities inheriting from QDialog have been implemented (CreateUser and MiniGenerateBox)
 
 **NEW FEATURES**
 
-- Now accepts zero-length input (replaced by the string "\<none\>") for all three fields when adding a new entry
-- Search bar has been improved, now allows for partial pattern matching ("test" finally matches both "testing" and "latest") and exact matching
-- Added French Localization
-
-**BUGFIXES**
-
-- Fixed zero-length input in either the username or password fields corrupting the database
-- "Fixed" special characters sometimes shortening a generated password and displaying as gibberish (actually replaced them by other non-alphanumeric characters)
+- Changed creation process: now appears as one single window
+- Added special edit dialog that allows for re-generation of a password
+- Added a clear button for the search bar
 
 **TO DO**
 
@@ -33,9 +25,9 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 # Download links
 
 **WINDOWS**  
-[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/v1.21/pwdmanager-qt-v1.21-windows-setup.exe)  
-[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v1.21/pwdmanager-qt-v1.21-windows.zip)
+[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows-setup.exe)  
+[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows.zip)
 
 **LINUX**  
 Linux version depends on Qt5. Installer script itself requires dialog.  
-[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v1.21/pwdmanager-qt-v1.21-linux.zip)
+[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-linux.zip)
