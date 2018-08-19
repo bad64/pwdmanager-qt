@@ -2,7 +2,7 @@
 
 using namespace std;
 
-DBRow *MainWindow::ReadFromFile()
+DBRow *MainWindow::readFromFile()
 {
     free(db);
 
@@ -77,7 +77,7 @@ DBRow *MainWindow::ReadFromFile()
     return db;
 }
 
-void MainWindow::WriteToFile()
+void MainWindow::writeToFile()
 {
     ofstream file(user.path);
 
@@ -97,7 +97,7 @@ void MainWindow::WriteToFile()
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::AppendToFile()
+void MainWindow::appendToFile()
 {
     ofstream file(user.path, ios::app);
 
@@ -111,7 +111,7 @@ void MainWindow::AppendToFile()
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::Import()
+void MainWindow::importFromFile()
 {
     char* buf;
     size_t buffersize;
@@ -148,10 +148,10 @@ void MainWindow::Import()
 
     newfile.close();
     originalfile.close();
-    RefreshView();
+    refreshView();
 }
 
-void MainWindow::Export()
+void MainWindow::exportToFile()
 {
     char* buf;
     size_t buffersize;
@@ -168,7 +168,7 @@ void MainWindow::Export()
         buf[buffersize] = '\0';
     #endif
 
-    QString filepath = QFileDialog::getSaveFileName(this, "Export", QString(buf));
+    QString filepath = QFileDialog::getSaveFileName(this, "exportToFile", QString(buf));
 
     ofstream file(filepath.toStdString().c_str());
 
@@ -185,7 +185,7 @@ void MainWindow::Export()
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::Backup()
+void MainWindow::backup()
 {
     char backuppath[255];
     strcpy(backuppath, user.path);
@@ -201,9 +201,9 @@ void MainWindow::Backup()
     file.close();
 }
 
-void MainWindow::Delete()
+void MainWindow::deleteRow()
 {
-    Backup();
+    backup();
 
     QItemSelectionModel* selection = table->selectionModel();
 
@@ -249,13 +249,13 @@ void MainWindow::Delete()
     }
 
     //Finally, write db to file and present view to the user
-    WriteToFile();
-    RefreshView();
+    writeToFile();
+    refreshView();
 }
 
-void MainWindow::Edit()
+void MainWindow::edit()
 {
-    Backup();
+    backup();
     QItemSelectionModel* selection = table->selectionModel();
 
     if (selection->hasSelection())
@@ -269,15 +269,15 @@ void MainWindow::Edit()
        switch (j)
        {
        case 0:
-           return;
+           db[i].username = (char *)QInputDialog::getText(this, tr("Edit"), "Enter a new username:", QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString().c_str();
+           break;
        case 1:
-           db[i].username = (char *)QInputDialog::getText(this, tr("Edit"), "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
+           db[i].purpose = (char *)QInputDialog::getText(this, tr("Edit"), "Enter what these credentials will be used for:", QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString().c_str();
            break;
        case 2:
-           db[i].purpose = (char *)QInputDialog::getText(this, tr("Edit"), "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
-           break;
-       case 3:
-           db[i].password = (char *)QInputDialog::getText(this, tr("Edit"), "", QLineEdit::Normal, textbuffer, &proceed).toStdString().c_str();
+           newPassword = new MiniGenerateBox(i, db[i].password);
+           QWidget::connect(newPassword, SIGNAL(returnPassword(uint,const char*)), this, SLOT(setNewPassword(uint,const char*)));
+           newPassword->exec();
            break;
        }
 
@@ -294,11 +294,11 @@ void MainWindow::Edit()
            return;
     }
 
-    WriteToFile();
-    RefreshView();
+    writeToFile();
+    refreshView();
 }
 
-void MainWindow::Copy()
+void MainWindow::copy()
 {
     QItemSelectionModel* selection = table->selectionModel();
 

@@ -5,7 +5,7 @@ int randint(int minvalue, int maxvalue)
     return rand() % (maxvalue+1-minvalue) + minvalue;
 }
 
-unsigned long GetSeed(char* username)
+unsigned long getSeed(char* username)
 {
     char *ptr;
     unsigned int hash = strtoul(username, &ptr, 36);

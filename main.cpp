@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     }
 
     //Seed RNG with username
-    srand(GetSeed(window.user.username));
+    srand(getSeed(window.user.username));
 
     //Check if directory exists && we have read/write access to it
     if (IsDir() != 0)
@@ -77,7 +77,6 @@ int main(int argc, char *argv[])
     if (window.user.path == NULL)
     {
         char errorString[255];
-        strcpy(errorString, window.user.path);
         strcat(errorString, "Heap allocation error: Cannot store path to database file. Exiting.");
 
         QMessageBox::critical(nullptr, "Error", QString(errorString));
@@ -85,8 +84,8 @@ int main(int argc, char *argv[])
     }
 
     //Setting up the database array
-    window.db = window.ReadFromFile();
-    window.Init();
+    window.db = window.readFromFile();
+    window.init();
 
     //Linux file permissions
     #if (defined (LINUX) || defined (__linux__) || defined(__APPLE__))

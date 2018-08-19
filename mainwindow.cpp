@@ -14,16 +14,16 @@ MainWindow::MainWindow()
     QMenu* optionFile = menuBar()->addMenu(tr("&File"));
         QAction* actionImport = new QAction(tr("Import"), this);
         optionFile->addAction(actionImport);
-        QObject::connect(actionImport, SIGNAL(triggered()), this, SLOT(Import()));
+        QObject::connect(actionImport, SIGNAL(triggered()), this, SLOT(importFromFile()));
 
         QAction* actionExport = new QAction(tr("Export"), this);
         optionFile->addAction(actionExport);
-        QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(Export()));
+        QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(exportToFile()));
 
         QAction* actionRefresh = new QAction(tr("Refresh View"), this);
         actionRefresh->setShortcut(Qt::Key_F5);
         optionFile->addAction(actionRefresh);
-        QObject::connect(actionRefresh, SIGNAL(triggered()), this, SLOT(RefreshView()));
+        QObject::connect(actionRefresh, SIGNAL(triggered()), this, SLOT(refreshView()));
 
         QAction* actionQuit = new QAction(tr("Quit"), this);
         optionFile->addAction(actionQuit);
@@ -32,41 +32,40 @@ MainWindow::MainWindow()
     QMenu* optionEdit = menuBar()->addMenu(tr("&Edit"));
         QAction* actionNew = new QAction(tr("New row"), this);
         optionEdit->addAction(actionNew);
-        QObject::connect(actionNew, SIGNAL(triggered()), this, SLOT(NewEntry()));
+        QObject::connect(actionNew, SIGNAL(triggered()), this, SLOT(newEntry()));
 
         QAction* actionDelete = new QAction(tr("Delete row"), this);
         optionEdit->addAction(actionDelete);
-        QObject::connect(actionDelete, SIGNAL(triggered()), this, SLOT(Delete()));
+        QObject::connect(actionDelete, SIGNAL(triggered()), this, SLOT(deleteRow()));
 
         QAction* actionEdit = new QAction(tr("Edit cell content"), this);
         optionEdit->addAction(actionEdit);
-        QObject::connect(actionEdit, SIGNAL(triggered()), this, SLOT(Edit()));
+        QObject::connect(actionEdit, SIGNAL(triggered()), this, SLOT(edit()));
 
         QAction* actionCopy = new QAction(tr("Copy password"), this);
         optionEdit->addAction(actionCopy);
-        QObject::connect(actionCopy, SIGNAL(triggered()), this, SLOT(Copy()));
+        QObject::connect(actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
 
     QMenu* optionMisc = menuBar()->addMenu("?");
         QAction* actionHelp = new QAction(tr("Help"), this);
         actionHelp->setShortcut(Qt::Key_F1);
         optionMisc->addAction(actionHelp);
-        QObject::connect(actionHelp, SIGNAL(triggered()), this, SLOT(Help()));
+        QObject::connect(actionHelp, SIGNAL(triggered()), this, SLOT(help()));
 
         QAction* actionAbout = new QAction(tr("About"), this);
         optionMisc->addAction(actionAbout);
-        QObject::connect(actionAbout, SIGNAL(triggered()), this, SLOT(About()));
+        QObject::connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
 
     //Main layout
     mainLayout = new QGridLayout;
 
     //Table holding contents of passwords file
-    table = new QTableWidget(0, 4);
-    table->setHorizontalHeaderLabels(QString(tr("ID;USERNAME;USED FOR;PASSWORD")).split(";"));
-    table->verticalHeader()->setVisible(false);
+    table = new QTableWidget(0, 3);
+    table->setHorizontalHeaderLabels(QString(tr("USERNAME;USED FOR;PASSWORD")).split(";"));
     table->horizontalHeader()->setStretchLastSection(true);
-    table->setColumnWidth(0, 50);
+    table->setColumnWidth(0, 100);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    QObject::connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Edit()));
+    QObject::connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(edit()));
 
     //Search box
     searchBoxFrame = new QFrame(this);
@@ -74,6 +73,7 @@ MainWindow::MainWindow()
     searchBoxFrame->setLineWidth(0);
 
     searchBoxLayout = new QVBoxLayout;
+    searchBoxSubLayout = new QHBoxLayout;
 
     searchBoxLabel = new QLabel(tr("Search:"));
     searchBoxLabel->setContentsMargins(0,0,0,0);
@@ -82,16 +82,22 @@ MainWindow::MainWindow()
     searchBox->setMinimumSize(150, 25);
     searchBox->setMaximumHeight(25);
     searchBox->setContentsMargins(0,0,0,0);
-    QObject::connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(Search()));
+    QObject::connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(search()));
 
     exactMatch = new QCheckBox(tr("E&xact match"), this);
     exactMatch->setTristate(false);
     exactMatch->setCheckState(Qt::Unchecked);
-    QObject::connect(exactMatch, SIGNAL(stateChanged(int)), this, SLOT(Search()));
+    QObject::connect(exactMatch, SIGNAL(stateChanged(int)), this, SLOT(search()));
+
+    clearButton = new QPushButton(tr("Clear"));
+    QWidget::connect(clearButton, SIGNAL(clicked(bool)), this, SLOT(clearSearch()));
+
+    searchBoxSubLayout->addWidget(exactMatch);
+    searchBoxSubLayout->addWidget(clearButton);
 
     searchBoxLayout->addWidget(searchBoxLabel);
     searchBoxLayout->addWidget(searchBox);
-    searchBoxLayout->addWidget(exactMatch);
+    searchBoxLayout->addLayout(searchBoxSubLayout);
 
     searchBoxFrame->setLayout(searchBoxLayout);
 
@@ -101,19 +107,19 @@ MainWindow::MainWindow()
 
     newButton = new QPushButton(tr("New Entry"));
     newButton->setMinimumSize(100, 25);
-    QObject::connect(newButton, SIGNAL(clicked(bool)), this, SLOT(NewEntry()));
+    QObject::connect(newButton, SIGNAL(clicked(bool)), this, SLOT(newEntry()));
 
     deleteButton = new QPushButton(tr("Delete"));
     deleteButton->setMinimumSize(100, 25);
-    QObject::connect(deleteButton, SIGNAL(clicked(bool)), this, SLOT(Delete()));
+    QObject::connect(deleteButton, SIGNAL(clicked(bool)), this, SLOT(deleteRow()));
 
     editButton = new QPushButton(tr("Edit"));
     editButton->setMinimumSize(100, 25);
-    QObject::connect(editButton, SIGNAL(clicked(bool)), this, SLOT(Edit()));
+    QObject::connect(editButton, SIGNAL(clicked(bool)), this, SLOT(edit()));
 
     copyButton = new QPushButton(tr("Copy"));
     copyButton->setMinimumSize(100, 25);
-    QObject::connect(copyButton, SIGNAL(clicked(bool)), this, SLOT(Copy()));
+    QObject::connect(copyButton, SIGNAL(clicked(bool)), this, SLOT(copy()));
 
     buttonsLayout->addWidget(newButton, 0, 0);
     buttonsLayout->addWidget(deleteButton, 0, 1);
@@ -145,19 +151,16 @@ MainWindow::MainWindow()
     setMinimumSize(640,480);
 }
 
-void MainWindow::Init()
+void MainWindow::init()
 {
     //Database to QTableWidget conversion
     for (unsigned int i = 0; i < lines; i++)
     {
         table->insertRow(table->rowCount());
 
-        //printf("%d  %s  %s  %s\n", db[i].id, db[i].username, db[i].purpose, db[i].password);
-
-        table->setItem(i, 0, new QTableWidgetItem(QString::number(db[i].id)));
-        table->setItem(i, 1, new QTableWidgetItem(db[i].username));
-        table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
-        table->setItem(i, 3, new QTableWidgetItem(db[i].password));
+        table->setItem(i, 0, new QTableWidgetItem(db[i].username));
+        table->setItem(i, 1, new QTableWidgetItem(db[i].purpose));
+        table->setItem(i, 2, new QTableWidgetItem(db[i].password));
     }
 
     std::stringstream statusbuffer;
@@ -172,9 +175,9 @@ void MainWindow::Init()
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::RefreshView()
+void MainWindow::refreshView()
 {
-    db = ReadFromFile();
+    db = readFromFile();
 
     table->setRowCount(0);
 
@@ -182,14 +185,13 @@ void MainWindow::RefreshView()
     {
         table->insertRow(table->rowCount());
 
-        table->setItem(i, 0, new QTableWidgetItem(QString::number(db[i].id)));
-        table->setItem(i, 1, new QTableWidgetItem(db[i].username));
-        table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
-        table->setItem(i, 3, new QTableWidgetItem(db[i].password));
+        table->setItem(i, 0, new QTableWidgetItem(db[i].username));
+        table->setItem(i, 1, new QTableWidgetItem(db[i].purpose));
+        table->setItem(i, 2, new QTableWidgetItem(db[i].password));
     }
 }
 
-void MainWindow::Search()
+void MainWindow::search()
 {
     table->setRowCount(0);
 
@@ -199,10 +201,9 @@ void MainWindow::Search()
         {
             table->insertRow(table->rowCount());
 
-            table->setItem(i, 0, new QTableWidgetItem(QString::number(db[i].id)));
-            table->setItem(i, 1, new QTableWidgetItem(db[i].username));
-            table->setItem(i, 2, new QTableWidgetItem(db[i].purpose));
-            table->setItem(i, 3, new QTableWidgetItem(db[i].password));
+            table->setItem(i, 0, new QTableWidgetItem(db[i].username));
+            table->setItem(i, 1, new QTableWidgetItem(db[i].purpose));
+            table->setItem(i, 2, new QTableWidgetItem(db[i].password));
         }
 
         std::stringstream statusbuffer;        
@@ -227,10 +228,9 @@ void MainWindow::Search()
                 {
                     table->insertRow(table->rowCount());
 
-                    table->setItem(j, 0, new QTableWidgetItem(QString::number(db[i].id)));
-                    table->setItem(j, 1, new QTableWidgetItem(db[i].username));
-                    table->setItem(j, 2, new QTableWidgetItem(db[i].purpose));
-                    table->setItem(j, 3, new QTableWidgetItem(db[i].password));
+                    table->setItem(j, 0, new QTableWidgetItem(db[i].username));
+                    table->setItem(j, 1, new QTableWidgetItem(db[i].purpose));
+                    table->setItem(j, 2, new QTableWidgetItem(db[i].password));
                     j++;
                 }
             }
@@ -256,10 +256,9 @@ void MainWindow::Search()
                 {
                     table->insertRow(table->rowCount());
 
-                    table->setItem(j, 0, new QTableWidgetItem(QString::number(db[i].id)));
-                    table->setItem(j, 1, new QTableWidgetItem(db[i].username));
-                    table->setItem(j, 2, new QTableWidgetItem(db[i].purpose));
-                    table->setItem(j, 3, new QTableWidgetItem(db[i].password));
+                    table->setItem(j, 0, new QTableWidgetItem(db[i].username));
+                    table->setItem(j, 1, new QTableWidgetItem(db[i].purpose));
+                    table->setItem(j, 2, new QTableWidgetItem(db[i].password));
                     j++;
                 }
             }
@@ -277,4 +276,9 @@ void MainWindow::Search()
             status->setText(QString(statusbuffer.str().c_str()));
         }
     }
+}
+
+void MainWindow::clearSearch()
+{
+    searchBox->setText("");
 }

@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include "includes.h"
+#include "createuser.h"
+#include "minigeneratebox.h"
 #include <QtWidgets>
 
 class MainWindow : public QMainWindow
@@ -10,43 +12,48 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-    void Init();
+    void init();
 
     User user;
     DBRow* db;
     unsigned int lines;
 
 public slots:
-    DBRow* ReadFromFile();
-    void WriteToFile();
-    void AppendToFile();
+    DBRow* readFromFile();
+    void writeToFile();
+    void appendToFile();
 
-    void Import();
-    void Export();
-    void Backup();
+    void importFromFile();
+    void exportToFile();
+    void backup();
 
-    void RefreshView();
-    void Search();
+    void refreshView();
+    void search();
+    void clearSearch();
 
-    void NewEntry();
-    void Delete();
-    void Edit();
-    void Copy();
+    void newEntry();
+    void addRow(const char*,const char*,const char*);
+    void deleteRow();
+    void edit();
+    void copy();
 
-    const char* Generate();
+    void setNewPassword(unsigned int line, const char*);
 
-    void Help();
-    void About();
+    void help();
+    void about();
 
 private:
+    //Main window
     QGridLayout* mainLayout;
     QTableWidget* table;
 
     QFrame* searchBoxFrame;
     QVBoxLayout* searchBoxLayout;
+    QHBoxLayout* searchBoxSubLayout;
     QLabel* searchBoxLabel;
     QLineEdit* searchBox;
     QCheckBox* exactMatch;
+    QPushButton* clearButton;
 
     QFrame* buttonsFrame;
     QGridLayout* buttonsLayout;
@@ -58,6 +65,12 @@ private:
     QFrame* statusFrame;
     QVBoxLayout* statusLayout;
     QLabel* status;
+
+    //User creation wizard
+    CreateUser* userWizard;
+
+    //Password re-generator
+    MiniGenerateBox* newPassword;
 };
 
 #endif // MAINWINDOW_H

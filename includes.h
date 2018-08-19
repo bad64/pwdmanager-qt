@@ -12,6 +12,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define VERSION "2.0"
+
 //Qt
 #include <QtWidgets>
 
@@ -41,15 +43,10 @@ struct DBRow
 
 //seed.cpp
 int randint(int minvalue, int maxvalue);
-unsigned long GetSeed(char *username);
+unsigned long getSeed(char *username);
 
-//database.cpp
-DBRow *ReadFromFile(User *user, unsigned int &value);
-void WriteFile();
-void AppendToFile();
-
-//clipboard.cpp
-void CopyToClipboard();
+//password.cpp
+const char* generate(unsigned int requiredLength, bool requireUppercase, bool requireNumerals, bool requireSpecials);
 
 //misc.cpp
 int IsDir();

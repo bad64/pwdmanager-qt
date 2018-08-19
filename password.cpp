@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-const char* MainWindow::Generate()
+const char* generate(unsigned int requiredLength, bool requireUppercase, bool requireNumerals, bool requireSpecials)
 {
     char lowercase[27] = "abcdefghijklmnopqrstuvwxyz";
     char uppercase[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -21,38 +21,12 @@ const char* MainWindow::Generate()
     uppercase[26] = '\0';
     numeric[10] = '\0';
 
-    unsigned int length = 10;
-    bool requireUppercase = false, requireNumeric = false, requireSpecial = false;
-    bool proceed = true;
-
-    //Qt stuff
-    int intlimit = std::numeric_limits<int>::max();
-    length = QInputDialog::getInt(this, tr("Password generation"), tr("Please enter the desired length of the password:"), 10, 0, intlimit, 1, &proceed);
-    if (proceed == false)
-    {
-        return "";
-    }
-
-    int qUppercase = QMessageBox::question(this, tr("Password Generation"), tr("Does your password requires uppercase letters ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    int qNumeric = QMessageBox::question(this, tr("Password Generation"), tr("Does your password requires numeric characters ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    int qSpecial = QMessageBox::question(this, tr("Password Generation"), tr("Does your password requires special characters (i.e. non alphanumeric) ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-
-    if (qUppercase == QMessageBox::Yes)
-        requireUppercase = true;
-
-    if (qNumeric == QMessageBox::Yes)
-        requireNumeric = true;
-
-    if (qSpecial == QMessageBox::Yes)
-        requireSpecial = true;
-
-    generation:
-    char* password = (char *)calloc(length+1, sizeof(char));
+    char* password = (char *)calloc(requiredLength+1, sizeof(char));
 
     //Now we actually generate the password
     do
     {
-        for (unsigned int i = 0; i < length+1; i++)
+        for (unsigned int i = 0; i < requiredLength+1; i++)
         {
             unsigned char listindex = randint(0, 3);
 
@@ -68,127 +42,67 @@ const char* MainWindow::Generate()
                     password[i] = lowercase[randint(0, strlen(lowercase))];
                 break;
             case 2:
-                if (requireNumeric == true)
+                if (requireNumerals == true)
                     password[i] = numeric[randint(0, strlen(numeric))];
                 else
                     password[i] = lowercase[randint(0, strlen(lowercase))];
                 break;
             case 3:
-                if (requireSpecial == true)
+                if (requireSpecials == true)
                     password[i] = special[randint(0, strlen(special))];
                 else
                     password[i] = lowercase[randint(0, strlen(lowercase))];
                 break;
             }
         }
-        password[length] = '\0';
+        password[requiredLength] = '\0';
 
-    } while(strlen(password) < length);
-
-    //Check if password already exists in the db (unlikely, but might as well)
-    for (unsigned int i = 0; i < lines; i++)
-    {
-        if (strcmp(password, db[i].password) == 0)
-            goto generation;    //Behold, one of the few acceptable cases for using goto
-    }
+    } while(strlen(password) < requiredLength);
 
     return password;
 }
 
-void MainWindow::NewEntry()
+void MainWindow::newEntry()
 {
-    Backup();
+    backup();
 
-    int id = 0;
-    QString unamebuf, prbuf, pwdbuf;
+    userWizard = new CreateUser();
+    QWidget::connect(userWizard, SIGNAL(returnUserStruct(const char*,const char*,const char*)), this, SLOT(addRow(const char*,const char*,const char*)));
+    userWizard->exec();
+}
 
-    int needsGeneration = 0;
-    bool proceed = true;
-
-    unamebuf = QInputDialog::getText(this, tr("Enter username"), tr("Please enter the user name for this entry:"), QLineEdit::Normal, QString(user.username), &proceed).toStdString().c_str();
-    if (proceed == false)
-        return;
-
-    if (unamebuf.isEmpty())
-        unamebuf = QString("<none>");
-
-    int purposeLoop;
-    do
-    {
-        prbuf = QInputDialog::getText(this, tr("Enter reason"), tr("Please enter what these credentials will be used for:"), QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
-        if (proceed == false)
-            return;
-
-        if (prbuf.isEmpty())
-        {
-            purposeLoop = QMessageBox::warning(this, tr("Warning"), tr("Are you sure you do not wish to specify what these credentials are for ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        }
-        else
-            purposeLoop = QMessageBox::Yes;
-
-    }while (purposeLoop != QMessageBox::Yes);
-
-    if (prbuf.isEmpty())
-        prbuf = QString("<none>");
-
-    needsGeneration = QMessageBox::question(this, tr("Password Generation"), tr("Shall the software generate a password ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-
-    if (needsGeneration == QMessageBox::No)
-    {
-        int passwordLoop;
-
-        do
-        {
-            pwdbuf = QInputDialog::getText(this, tr("Enter password"), tr("Please enter the password that will be stored:"), QLineEdit::Normal, QString(""), &proceed).toStdString().c_str();
-            if (proceed == false)
-                return;
-
-            if (pwdbuf.isEmpty())
-            {
-                passwordLoop = QMessageBox::warning(this, tr("Warning"), tr("Are you sure you want an empty password ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-            }
-            else
-                passwordLoop = QMessageBox::Yes;
-
-        }while (passwordLoop != QMessageBox::Yes);
-
-        if (pwdbuf.isEmpty())
-            pwdbuf = QString("<none>");
-    }
-    else
-    {
-        pwdbuf = QString::fromUtf8(Generate());
-        if (strcmp(pwdbuf.toStdString().c_str(), "") == 0)
-            return;
-    }
-
-    //Eliminate commas
-    unamebuf.remove(QChar(','));
-    prbuf.remove(QChar(','));
-    pwdbuf.remove(QChar(','));
-
-    id = lines+1;
+void MainWindow::addRow(const char* n_username, const char* n_purpose, const char* n_password)
+{
+    int id = lines+1;
 
     DBRow* temp = db;
 
-    db = (DBRow *)calloc(lines+1, sizeof(DBRow));
+    db = (DBRow *)calloc(id, sizeof(DBRow));
     for (unsigned int i = 0; i < lines; i++)
         db[i] = temp[i];
 
     db[lines].id = id;
 
-    db[lines].username = (char *)calloc((strlen(unamebuf.toStdString().c_str())+1), sizeof(char));
-    strcpy(db[lines].username, unamebuf.toStdString().c_str());
+    db[lines].username = (char *)calloc(strlen(n_username+1), sizeof(char));
+    strcpy(db[lines].username, n_username);
 
-    db[lines].purpose = (char *)calloc((strlen(prbuf.toStdString().c_str())+1), sizeof(char));
-    strcpy(db[lines].purpose, prbuf.toStdString().c_str());
+    db[lines].purpose = (char *)calloc(strlen(n_purpose+1), sizeof(char));
+    strcpy(db[lines].purpose, n_purpose);
 
-    db[lines].password = (char *)calloc((strlen(pwdbuf.toStdString().c_str())+1), sizeof(char));
-    strcpy(db[lines].password, pwdbuf.toStdString().c_str());
+    db[lines].password = (char *)calloc(strlen(n_password+1), sizeof(char));
+    strcpy(db[lines].password, n_password);
 
     lines++;
 
-    //WriteToFile();
-    AppendToFile();
-    RefreshView();
+    appendToFile();
+    refreshView();
+}
+
+void MainWindow::setNewPassword(unsigned int line, const char* n_password)
+{
+    db[line].password = (char *)calloc(strlen(n_password+1), sizeof(char));
+    strcpy(db[line].password, n_password);
+
+    writeToFile();
+    refreshView();
 }

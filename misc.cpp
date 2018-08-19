@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-void MainWindow::Help()
+void MainWindow::help()
 {
     QMessageBox::about(this, tr("Help"), tr("Add a new row with New Entry.\n"
                                             "Double click on a cell, or highlight it then press the Edit button to edit its contents.\n"
@@ -13,14 +13,16 @@ void MainWindow::Help()
                                             "file. Import it in the manager, and you should get your passwords back like they were before the transaction.") );
 }
 
-void MainWindow::About()
+void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About"), tr("pwdmanager-qt version 1.21 by Lou VINCENT aka Bad64\n"
-                                            "Made with Qt 5.10, based on pwdmanager (also by Bad64)\n\n"
-                                            "This software is provided as-is, free of charge, for personal use.\n"
-                                            "It is not meant to be used in a professional environment, although it probably is ready to be.\n"
-                                            "Bad64 shall not be held responsible for any stolen passwords by nosy coworkers looking above one's shoulder, "
-                                            "loss of important login credentials, or broken coffee machines.") );
+    std::stringstream aboutString;
+    aboutString << tr("pwdmanager-qt version ").toStdString() << VERSION << tr(" by Lou VINCENT aka Bad64.\n").toStdString();
+    aboutString << tr("Made with Qt ").toStdString() << qVersion() << tr(", with GCC version ").toStdString() << __VERSION__ << tr(", based on pwdmanager (also by Bad64).\n\n").toStdString();
+    aboutString << tr("This software is provided as-is, free of charge, for personal use.\n").toStdString();
+    aboutString << tr("Bad64 shall not be held responsible for passwords stolen by coworkers looking above one's shoulder, ").toStdString();
+    aboutString << tr("loss of important credentials, or broken coffee machines.").toStdString();
+
+    QMessageBox::about(this, tr("About"), aboutString.str().c_str());
 }
 
 int IsDir() //Not part of the MainWindow namespace
