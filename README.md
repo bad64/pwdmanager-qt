@@ -29,5 +29,5 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 [Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows.zip)
 
 **LINUX**  
-Linux version depends on Qt5. Installer script itself requires dialog.  
+Linux version depends on Qt5. Installer script itself requires dialog and sudo privileges.  
 [Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-linux.zip)
