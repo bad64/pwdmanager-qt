@@ -20,8 +20,6 @@
     #include <winbase.h>
 #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
     #include <unistd.h>
-    #include <security/pam_appl.h>
-    #include <security/pam_misc.h>
 #endif
 
 #include "credentialsfile.h"
