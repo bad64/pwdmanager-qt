@@ -17,7 +17,7 @@ public slots:
     void quit();
 
 signals:
-    void returnUserStruct(const char* username, const char* purpose, const char* password);
+    void returnUserStruct(std::string username, std::string purpose, std::string password);
 
 private:
     //Layouts

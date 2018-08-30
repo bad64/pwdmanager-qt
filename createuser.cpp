@@ -73,13 +73,13 @@ void CreateUser::validate()
     if (passwordLine->text().isEmpty())
         passwordLine->setText("<none>");
 
-    emit returnUserStruct(usernameLine->text().toStdString().c_str(), purposeLine->text().toStdString().c_str(), passwordLine->text().toStdString().c_str());
+    emit returnUserStruct(usernameLine->text().toStdString(), purposeLine->text().toStdString(), passwordLine->text().toStdString());
     this->close();
 }
 
 void CreateUser::requestGenerate()
 {
-    passwordLine->setText(QString(generate(requiredLength->value(), requiresCapitals->isChecked(), requiresNumerals->isChecked(), requiresSpecials->isChecked())));
+    passwordLine->setText(QString(generate(requiredLength->value(), requiresCapitals->isChecked(), requiresNumerals->isChecked(), requiresSpecials->isChecked()).c_str()));
 }
 
 void CreateUser::quit()

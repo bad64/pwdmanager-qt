@@ -1,20 +1,18 @@
 #include "minigeneratebox.h"
 
-MiniGenerateBox::MiniGenerateBox(int nline, char *oldpw)
+MiniGenerateBox::MiniGenerateBox(int nline, std::string oldpw)
 {
     QWidget::setWindowTitle(tr("Edit password"));
     this->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     mainLayout = new QVBoxLayout(this);
 
     line = nline;
-    oldpassword = (char *)calloc(strlen(oldpw)+1, sizeof(char));
-    strcpy(oldpassword, oldpw);
-    oldpassword[strlen(oldpassword)] = '\0';
+    oldpassword = oldpw;
 
     passwordLayout = new QVBoxLayout;
     passwordLabel = new QLabel(tr("Enter a new password (or generate one):"));
     passwordLine = new QLineEdit;
-    passwordLine->setText(QString(oldpw));
+    passwordLine->setText(QString(oldpw.c_str()));
     passwordLayout->addWidget(passwordLabel);
     passwordLayout->addWidget(passwordLine);
 
@@ -67,7 +65,7 @@ void MiniGenerateBox::validate()
 
 void MiniGenerateBox::requestGenerate()
 {
-    passwordLine->setText(QString(generate(requiredLength->value(), requiresCapitals->isChecked(), requiresNumerals->isChecked(), requiresSpecials->isChecked())));
+    passwordLine->setText(QString(generate(requiredLength->value(), requiresCapitals->isChecked(), requiresNumerals->isChecked(), requiresSpecials->isChecked()).c_str()));
 }
 
 void MiniGenerateBox::quit()

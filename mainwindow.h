@@ -4,6 +4,7 @@
 #include "includes.h"
 #include "createuser.h"
 #include "minigeneratebox.h"
+#include "credentialsfile.h"
 #include <QtWidgets>
 
 class MainWindow : public QMainWindow
@@ -19,26 +20,35 @@ public:
     unsigned int lines;
 
 public slots:
+    //database.cpp
     DBRow* readFromFile();
     void writeToFile();
-    void appendToFile();
-
+    void deleteRow();
+    void edit();
+    void copy();
+    void backup();
+    void restore();
+    void moveRowUp();
+    void moveRowDown();
     void importFromFile();
     void exportToFile();
-    void backup();
+    void convertOldFile();
 
+    //mainwindow.cpp
+    void hideTable();
     void refreshView();
     void search();
     void clearSearch();
 
+    //password.cpp (should probably be moved to database.cpp)
     void newEntry();
-    void addRow(const char*,const char*,const char*);
-    void deleteRow();
-    void edit();
-    void copy();
+    void addRow(std::string, std::string, std::string);
+    void setNewPassword(unsigned int line, std::string);
 
-    void setNewPassword(unsigned int line, const char*);
+    //askuserpassword.cpp
+    int askUserPassword();
 
+    //misc.cpp
     void help();
     void about();
 
@@ -71,6 +81,9 @@ private:
 
     //Password re-generator
     MiniGenerateBox* newPassword;
+
+    //Optical camouflage technology
+    bool hide;
 };
 
 #endif // MAINWINDOW_H

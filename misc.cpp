@@ -5,9 +5,11 @@ void MainWindow::help()
     QMessageBox::about(this, tr("Help"), tr("Add a new row with New Entry.\n"
                                             "Double click on a cell, or highlight it then press the Edit button to edit its contents.\n"
                                             "Highlight a cell and press Delete to erase the entire row.\n"
-                                            "Copy copies the highlighted row's password field into your OS' clipboard.\n\n"
+                                            "Copy copies the highlighted row's password field into your OS' clipboard.\n"
+                                            "Move rows around with Ctrl+Up or Ctrl+Down.\n\n"
                                             "The search field looks for a case-insensitive match of the string entered. It is, however, accent-sensitive (e.g. "
-                                            "it will not match \"Umlaut\" and \"Ümlaut\").\n\n"
+                                            "it will not match \"Umlaut\" and \"Ümlaut\").\n"
+                                            "Press Ctrl+H to hide/unhide the table (if someone is spying on you !)\n\n"
                                             "In case things go horribly wrong during a transaction (e.g. power loss), you can find a backup of the database "
                                             "in the application data (%AppData%\\Roaming\\passwordmanager on Windows, $HOME/.passwordmanager on Linux) as a .bak "
                                             "file. Import it in the manager, and you should get your passwords back like they were before the transaction.") );
@@ -29,32 +31,20 @@ int IsDir() //Not part of the MainWindow namespace
 {
     struct stat info;
 
-    char* temppath;
-    size_t temppathsize;
+    std::string temppath;
     #if (defined (_WIN32) || defined (_WIN64))
-        temppathsize = (sizeof(char) * (strlen(getenv("APPDATA")) + strlen("\\passwordmanager") + 1) );
+        temppath = getenv("APPDATA");
+        temppath.append("\\passwordmanager");
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        temppathsize = (sizeof(char) * (strlen(getenv("HOME")) + strlen("\\passwordmanager") + 1) );
+        temppath = getenv("HOME");
+        temppath.append("/.passwordmanager");
     #endif
 
-    temppath = (char *)calloc(temppathsize, sizeof(char));
-
-    #if (defined (_WIN32) || defined (_WIN64))
-        strcpy(temppath, getenv("APPDATA"));
-        strcat(temppath, "\\passwordmanager");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        strcpy(temppath, getenv("HOME"));
-        strcpy(temppath, "/.passwordmanager");
-    #endif
-
-    temppath[temppathsize] = '\0';
-
-    if (stat(temppath, &info) == 0)
+    if (stat(temppath.c_str(), &info) == 0)
     {
         if (info.st_mode & S_IFDIR)
         {
             //Means everything is fine. No need to do anything here.
-            //std::cout << "Opened directory at " << temppath << std::endl;
         }
         else
         {
@@ -64,12 +54,32 @@ int IsDir() //Not part of the MainWindow namespace
     else
     {
         #if (defined (_WIN32) || defined (_WIN64))
-            CreateDirectoryA(temppath, NULL);
+            CreateDirectoryA(temppath.c_str(), NULL);
         #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-            mkdir(temppath, S_IRWXU);
-            chmod(temppath, S_IRWXU);
+            mkdir(temppath.c_str(), S_IRWXU);
+            chmod(temppath.c_str(), S_IRWXU);
         #endif
     }
 
     return 0;
+}
+
+std::string xorCrypt(std::string msg, std::string key)
+{
+    if (key.empty())
+        key = "tK5+j*$k67"; //IMPORTANT: Not the actual key used in the release
+
+    std::string tmp(key);
+    while(tmp.size() < msg.size())
+        tmp += key;
+
+    for (std::string::size_type i = 0; i < msg.size(); i++)
+    {
+        if  (((msg[i] ^ tmp[i % tmp.size()]) != '\n') && ((msg[i] ^ tmp[i % tmp.size()]) != ',') && ((msg[i] ^ tmp[i % tmp.size()]) != '\x01E'))
+            msg[i] ^= tmp[i % tmp.size()];
+        else
+            msg[i] = msg[i];
+    }
+
+    return msg;
 }

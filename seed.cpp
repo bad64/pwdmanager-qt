@@ -5,10 +5,14 @@ int randint(int minvalue, int maxvalue)
     return rand() % (maxvalue+1-minvalue) + minvalue;
 }
 
-unsigned long getSeed(char* username)
+unsigned long getSeed(std::string username)
 {
+    //It's kind of pointless to be honest, but standard issue random doesn't cut it for me,
+    //and I didn't want to implement a more complex engine. YMMV whether it's better than
+    //rand() or not.
+
     char *ptr;
-    unsigned int hash = strtoul(username, &ptr, 36);
+    unsigned int hash = strtoul(username.c_str(), &ptr, 36);
     unsigned int programStart = time(NULL);
     unsigned int programNow;
     unsigned long seed = time(NULL);

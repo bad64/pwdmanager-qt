@@ -4,19 +4,25 @@ A large(ish) rework of my console-only multiplatform password manager that you c
 
 Made with Qt 5.10. It has a couple more functions than its console counterpart, like editing database rows, or cross-platform copy to clipboard.
 
-# Latest update: v2.0, 20/08/18
+# Latest update: v2.1, 30/08/18
 
-**CHANGES FROM v1.21**
+**CODE CHANGES**
 
-- All: Downgraded Qt version to 5.7 for compatibility's sake (makes no change to the actual code)
-- All: Function naming convention has been changed from UpperCamelCase to camelCase
-- All: New subwindow facilities inheriting from QDialog have been implemented (CreateUser and MiniGenerateBox)
+- All: Removed (almost) all the C-style code, replaced by equivalent C++ code (this actually saves around 200kb of RAM usage)
+- All: Moved some functions around for better file organization. Also function definitions roughly match the order used in mainwindow.h.
+- All: Added sanity checks when importing a database file.
+- All: Added a launch option to set language, independently of OS language settings. Since the code is only translated in French at the moment, it only works with French.
 
-**NEW FEATURES**
+**FEATURES**
 
-- Changed creation process: now appears as one single window
-- Added special edit dialog that allows for re-generation of a password
-- Added a clear button for the search bar
+- All: New file format. A tool to convert the old database to the new format has been included.
+- All: Move rows up or down using Ctrl+up/down
+- All: Added shortcut (Ctrl + H) to hide the table view. On Windows, it prompts for user password on unhide. On Linux, it doesn't (see comments in askuserpassword.cpp)
+- All: Added an option to restore db from backup
+
+**KNOWN ISSUES**
+
+- Linux: Does not ask for password on unhide (see comments in askuserpassword.cpp for why it will probably not get fixed)
 
 **TO DO**
 

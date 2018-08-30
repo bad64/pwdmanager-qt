@@ -2,53 +2,52 @@
 #define INCLUDES_H
 
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <limits>
-#include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <cstring>
+#include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define VERSION "2.0"
+#define VERSION "2.1"
 
 //Qt
 #include <QtWidgets>
 
 #if (defined (_WIN32) || defined (_WIN64))
-    #include <conio.h>
-    #include <io.h>
     #include <windows.h>
+    #include <winbase.h>
 #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
     #include <unistd.h>
+    #include <security/pam_appl.h>
+    #include <security/pam_misc.h>
 #endif
 
-typedef struct User User;
+#include "credentialsfile.h"
+
 struct User
 {
-    char* username;
-    char* path;
+    std::string username;
+    std::string path;
 };
 
-typedef struct DBRow DBRow;
 struct DBRow
 {
-    int id;
-    char* username;
-    char* purpose;
-    char* password;
+    std::string username;
+    std::string purpose;
+    std::string password;
 };
 
 //seed.cpp
 int randint(int minvalue, int maxvalue);
-unsigned long getSeed(char *username);
+unsigned long getSeed(std::string username);
 
 //password.cpp
-const char* generate(unsigned int requiredLength, bool requireUppercase, bool requireNumerals, bool requireSpecials);
+std::string generate(unsigned int requiredLength, bool requireUppercase, bool requireNumerals, bool requireSpecials);
 
 //misc.cpp
 int IsDir();
+std::string xorCrypt(std::string msg, std::string key = "");
 
 #endif // INCLUDES_H

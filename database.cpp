@@ -6,71 +6,122 @@ DBRow *MainWindow::readFromFile()
 {
     free(db);
 
-    fstream file(user.path);
+    fstream file(user.path, ios::in | ios::binary);
 
     if (!file)
     {
-        file.open(user.path, ios::out);
-        //cout << "Created database at " << user.path << endl;
-        file.close();
-        file.open(user.path, ios::in);
+        createBinaryFile(user.path);    //If db does not exist, create it
+        file.open(user.path, ios::in | ios::binary);
+    }
+
+    //Checking header to see if file is valid
+    char buf;
+    file.get(buf);
+
+    if (buf != '\x001')
+    {
+        //Bad header
+        std::stringstream statusbuffer;
+        statusbuffer << tr("Invalid file format").toStdString();
+
+        status->setText(QString(statusbuffer.str().c_str()));
+
+        lines = 0;
+        db = (DBRow *)calloc(0, sizeof(DBRow));
     }
     else
     {
-        //cout << "Database located at " << user.path << endl;
-    }
+        std::stringstream signature;
 
-    string line;
-    lines = 0;
-    while(getline(file, line))
-        lines++;
+        while (buf != '\x002')
+        {
+            file.get(buf);
+            if (buf != '\x002')
+                signature << buf;
+        }
 
-    DBRow* db = (DBRow *)calloc(lines, sizeof(DBRow));
-    if (db == NULL)
-    {
-        cout << "Heap allocation failed !" << endl;
-        exit(1);
-    }
-    else
-    {
-        //cout << "Retrieved " << lines << " entries" << endl;
-    }
+        if (signature.str().compare("CRDNTLS") != 0)
+        {
+            //Bad signature (possible file corruption or wrong import)
+            std::stringstream statusbuffer;
+            statusbuffer << tr("Invalid header signature").toStdString();
 
-    file.close();
-    file.open(user.path, ios::in);
+            status->setText(QString(statusbuffer.str().c_str()));
 
-    for (unsigned int i = 0; i < lines; i++)
-    {
-        DBRow buffer;
+            lines = 0;
+            db = (DBRow *)calloc(0, sizeof(DBRow));
+        }
+        else
+        {
+            lines = 0;
+            db = (DBRow *)calloc(0, sizeof(DBRow));
 
-        getline(file, line);
+            //Get the number of entries in the file
+            int startOfText = file.tellg();
 
-        char delimiter = ',';
-        int pos = 0;
+            while (file)
+            {
+                file.get(buf);
+                if (buf == '\x01E')
+                    lines++;
+            }
 
-        string token = line.substr(0, line.find(delimiter));
-        buffer.id = stoi(token);
-        pos = line.find(delimiter, pos) + 1;
+            file.close();
+            file.open(user.path, ios::in | ios::binary);
+            file.seekg(startOfText);    //Back to end of header
+            db = (DBRow *)calloc(lines, sizeof(DBRow));
 
-        token = line.substr(pos, line.find(delimiter, pos)-pos);
-        buffer.username = (char *)calloc(strlen(token.c_str())+1, sizeof(char));
-        strcpy(buffer.username, token.c_str());
-        buffer.username[strlen(buffer.username)] = '\0';
-        pos = line.find(delimiter, pos) + 1;
+            //Change status to tell the user that the file is good
+            std::stringstream statusbuffer;
+            statusbuffer << tr("Read ").toStdString() << lines << tr(" lines").toStdString();
+            status->setText(QString(statusbuffer.str().c_str()));
 
-        token = line.substr(pos, line.find(delimiter, pos)-pos);
-        buffer.purpose = (char *)calloc(strlen(token.c_str())+1, sizeof(char));
-        strcpy(buffer.purpose, token.c_str());
-        buffer.purpose[strlen(buffer.purpose)] = '\0';
-        pos = line.find(delimiter, pos) + 1;
+            //Now we can actually read the file into the array
+            std::stringstream ssbuf;
+            std::string encryptedbuf;
+            file.get(buf);
 
-        token = line.substr(pos, line.find(delimiter, pos)-pos);
-        buffer.password = (char *)calloc(strlen(token.c_str())+1, sizeof(char));
-        strcpy(buffer.password, token.c_str());
-        buffer.password[strlen(buffer.password)] = '\0';
-        pos = line.find(delimiter, pos) + 1;
+            for (unsigned int i = 0; i < lines; i++)
+            {
+                while (buf != ',')
+                {
+                    if (buf != ',')
+                        ssbuf << buf;
+                    file.get(buf);
+                }
 
-        db[i] = buffer;
+                encryptedbuf = xorCrypt(ssbuf.str());
+                db[i].username = encryptedbuf.c_str();
+                ssbuf.str(std::string());
+                file.get(buf);
+
+                while (buf != ',')
+                {
+                    if (buf != ',')
+                        ssbuf << buf;
+
+                    file.get(buf);
+                }
+
+                encryptedbuf = xorCrypt(ssbuf.str());
+                db[i].purpose = encryptedbuf.c_str();
+                ssbuf.str(std::string());
+                file.get(buf);
+
+                while (buf != '\x01E')
+                {
+                    if (buf != '\x01E')
+                        ssbuf << buf;
+                    file.get(buf);
+                }
+
+                encryptedbuf = xorCrypt(ssbuf.str());
+                db[i].password = encryptedbuf.c_str();
+                ssbuf.str(std::string());
+
+                file.get(buf);
+            }
+        }
     }
 
     file.close();
@@ -79,13 +130,16 @@ DBRow *MainWindow::readFromFile()
 
 void MainWindow::writeToFile()
 {
-    ofstream file(user.path);
+    fstream file(user.path, ios::out | ios::binary);
+
+    file << '\x001' << "CRDNTLS" << '\x002'; //Header
 
     for (unsigned int i = 0; i < lines; i++)
     {
-        file << db[i].id << "," << db[i].username << "," << db[i].purpose << "," << db[i].password << ",\n";
+        file << xorCrypt(db[i].username) << "," << xorCrypt(db[i].purpose) << "," << xorCrypt(db[i].password) << "\x01E";
     }
 
+    file << EOF;
     file.close();
 
     std::stringstream statusbuffer;
@@ -97,38 +151,230 @@ void MainWindow::writeToFile()
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::appendToFile()
+void MainWindow::deleteRow()
 {
-    ofstream file(user.path, ios::app);
+    if (!hide)  //Disallow delete if table is hidden
+    {
+        backup();
 
-    file << db[lines-1].id << "," << db[lines-1].username << "," << db[lines-1].purpose << "," << db[lines-1].password << ",\n";
+        QItemSelectionModel* selection = table->selectionModel();
 
+        if (selection->hasSelection())
+        {
+           int areyousure = QMessageBox::warning(this, tr("Warning"), tr("This will delete the entire row from the database.\n"
+                                                                            "This operation is not recoverable. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
+
+            if (areyousure == QMessageBox::No)
+                return;
+            else
+            {
+                unsigned int i = table->selectionModel()->currentIndex().row();
+
+                //Create db array of size n-1
+                DBRow* temparray = (DBRow *)calloc(lines-1, sizeof(DBRow));
+
+                //Copy current db to temporary array except the line to be deleted
+                int k = 0;
+                for (unsigned int j = 0; j < lines; j++)
+                {
+                    if (j != i)
+                    {
+                        temparray[k] = db[j];
+                        k++;
+                    }
+                }
+
+                //Downsize actual db
+                lines--;
+                db = (DBRow *)realloc(db, sizeof(DBRow) * lines);   //Realloc doesn't keep array contents, hence why we store the db in a temp array
+
+                //Copy back everything into the database
+                for (unsigned int j = 0; j < lines; j++)
+                {
+                    db[j] = temparray[j];
+                }
+            }
+        }
+
+        //Finally, write db to file and present view to the user
+        writeToFile();
+        refreshView();
+    }
+}
+
+void MainWindow::edit()
+{
+    if (!hide)  //Disallow edits while table is hidden
+    {
+        backup();
+        QItemSelectionModel* selection = table->selectionModel();
+
+        if (selection->hasSelection())
+        {
+           int i = table->selectionModel()->currentIndex().row();
+           int j = table->selectionModel()->currentIndex().column();
+
+           QString textbuffer = table->model()->data(table->model()->index(i, j)).toString();
+           bool proceed = true;
+
+           switch (j)
+           {
+           case 0:
+               db[i].username = QInputDialog::getText(this, tr("Edit"), tr("Enter a new username:"), QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString();
+               break;
+           case 1:
+               db[i].purpose = QInputDialog::getText(this, tr("Edit"), tr("Enter what these credentials will be used for:"), QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString();
+               break;
+           case 2:
+               newPassword = new MiniGenerateBox(i, db[i].password);
+               QWidget::connect(newPassword, SIGNAL(returnPassword(uint, std::string)), this, SLOT(setNewPassword(uint, std::string)));
+               newPassword->exec();
+               break;
+           }
+
+           if (proceed == false)
+               return;
+           else
+           {
+               if (db[i].username.empty())
+                   db[i].username = "<none>";
+
+               if (db[i].purpose.empty())
+                   db[i].purpose = "<none>";
+
+               if (db[i].password.empty())
+                   db[i].password = "<none>";
+
+               writeToFile();
+               refreshView();
+           }
+        }
+    }
+}
+
+void MainWindow::copy()
+{
+    if (!hide)  //Disallow copy while table is hidden
+    {
+        QItemSelectionModel* selection = table->selectionModel();
+
+        if (selection->hasSelection())
+        {
+            int i = table->selectionModel()->currentIndex().row();
+
+            QClipboard* clipboard = QApplication::clipboard();
+            clipboard->setText(QString(table->model()->data(table->model()->index(i, 2)).toString()));
+
+            stringstream statusbuffer;
+            statusbuffer << tr("Copied password from row ").toStdString() << i+1 << tr("\nto clipboard").toStdString();
+
+            status->setText(QString(statusbuffer.str().c_str()));
+        }
+    }
+}
+
+void MainWindow::backup()
+{
+    std::string backuppath = user.path;
+    backuppath.append(".bak");
+
+    fstream file(backuppath.c_str(), ios::out | ios::binary);
+
+    file << '\x001' << "CRDNTLS" << '\x002'; //Header
+
+    for (unsigned int i = 0; i < lines; i++)
+    {
+        file << xorCrypt(db[i].username) << "," << xorCrypt(db[i].purpose) << "," << xorCrypt(db[i].password) << "\x01E";
+    }
+
+    file << EOF;
     file.close();
+}
 
-    std::stringstream statusbuffer;
-    statusbuffer << tr("Wrote 1 entry.").toStdString();
+void MainWindow::restore()
+{
+    std::string backuppath = user.path;
+    backuppath.append(".bak");
 
-    status->setText(QString(statusbuffer.str().c_str()));
+    fstream originalfile(user.path.c_str(), std::ios::out | std::ios::binary);
+    fstream backup(backuppath.c_str(), std::ios::in | std::ios::binary);
+
+    originalfile << backup.rdbuf();
+
+    backup.close();
+    originalfile.close();
+    refreshView();
+}
+
+void MainWindow::moveRowUp()
+{
+    if (!hide)  //Disallow moves while table is hidden
+    {
+        backup();
+        QItemSelectionModel* selection = table->selectionModel();
+
+        if (selection->hasSelection())
+        {
+           int i = table->selectionModel()->currentIndex().row();
+           int j = table->selectionModel()->currentIndex().column();
+
+           if (i - 1 >= 0)
+           {
+               DBRow temp = db[i-1];
+
+               db[i-1] = db[i];
+               db[i] = temp;
+
+               writeToFile();
+               refreshView();
+
+               QModelIndex next = table->model()->index(i-1, j);
+               table->setCurrentIndex(next);
+           }
+        }
+    }
+}
+
+void MainWindow::moveRowDown()
+{
+    if (!hide)  //Disallow moves while table is hidden
+    {
+        backup();
+        QItemSelectionModel* selection = table->selectionModel();
+
+        if (selection->hasSelection())
+        {
+           unsigned int i = table->selectionModel()->currentIndex().row();
+           unsigned int j = table->selectionModel()->currentIndex().column();
+
+           if (i + 1 < lines)
+           {
+               DBRow temp = db[i+1];
+
+               db[i+1] = db[i];
+               db[i] = temp;
+
+               writeToFile();
+               refreshView();
+
+               QModelIndex next = table->model()->index(i+1, j);
+               table->setCurrentIndex(next);
+           }
+        }
+    }
 }
 
 void MainWindow::importFromFile()
 {
-    char* buf;
-    size_t buffersize;
+    std::string buf;
     #if (defined (_WIN32) || defined (_WIN64))
-        buffersize = sizeof(char) * (strlen(getenv("USERPROFILE")) + strlen("\\Documents") + 1);
-        buf = (char *)calloc(buffersize, sizeof(char));
-        strcpy(buf, getenv("USERPROFILE"));
-        strcat(buf, "\\Documents");
-        buf[buffersize] = '\0';
+        buf = getenv("USERPROFILE");
+        buf.append("\\Documents");
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        buffersize = sizeof(char) * strlen(getenv("HOME"));
-        buf = (char *)calloc(buffersize, sizeof(char));
-        strcpy(buf, getenv("HOME"));
-        buf[buffersize] = '\0';
+        buf = getenv("HOME");
     #endif
 
-    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf));
+    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf.c_str()), QString("Credentials Database (*.crbd)"));
 
     if (filepath.isEmpty())
         return;
@@ -141,9 +387,23 @@ void MainWindow::importFromFile()
 
     free(db);
 
-    ifstream newfile(filepath.toStdString().c_str());
-    ofstream originalfile(user.path);
+    fstream newfile(filepath.toStdString().c_str(), ios::in | ios::binary);
 
+    //Check if valid file
+    char nbuf;
+    newfile.get(nbuf);
+
+    if (nbuf != '\x001')
+    {
+        QMessageBox::critical(this, tr("Invalid file"), tr("This file does not appear to be a valid .crdb file !"), QMessageBox::Ok);
+
+        newfile.close();
+        refreshView();
+
+        return;
+    }
+
+    fstream originalfile(user.path, ios::out | ios::binary);
     originalfile << newfile.rdbuf();
 
     newfile.close();
@@ -153,165 +413,100 @@ void MainWindow::importFromFile()
 
 void MainWindow::exportToFile()
 {
-    char* buf;
-    size_t buffersize;
+    std::string buf;
     #if (defined (_WIN32) || defined (_WIN64))
-        buffersize = sizeof(char) * (strlen(getenv("USERPROFILE")) + strlen("\\Documents") + 1);
-        buf = (char *)calloc(buffersize, sizeof(char));
-        strcpy(buf, getenv("USERPROFILE"));
-        strcat(buf, "\\Documents");
-        buf[buffersize] = '\0';
+        buf = getenv("USERPROFILE");
+        buf.append("\\Documents");
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        buffersize = sizeof(char) * strlen(getenv("HOME"));
-        buf = (char *)calloc(buffersize, sizeof(char));
-        strcpy(buf, getenv("HOME"));
-        buf[buffersize] = '\0';
+        buf = getenv("HOME");
     #endif
 
-    QString filepath = QFileDialog::getSaveFileName(this, "exportToFile", QString(buf));
+    QString filepath = QFileDialog::getSaveFileName(this, "exportToFile", QString(buf.c_str()), QString("Credentials Database (*.crbd)"));
 
-    ofstream file(filepath.toStdString().c_str());
+    fstream file(filepath.toStdString().c_str(), ios::out | ios::binary);
+    file << '\x001' << "CRDNTLS" << '\x002';
 
     for (unsigned int i = 0; i < lines; i++)
     {
-        file << db[i].id << "," << db[i].username << "," << db[i].purpose << "," << db[i].password << ",\n";
+        file << xorCrypt(db[i].username) << "," << xorCrypt(db[i].purpose) << "," << xorCrypt(db[i].password) << "\x01E";
     }
 
+    file << EOF;
     file.close();
 
     std::stringstream statusbuffer;
-    statusbuffer << tr("Exported database to ").toStdString() << filepath.toStdString().c_str() << ".";
+    statusbuffer << tr("Exported database to\n").toStdString() << filepath.toStdString().c_str() << ".";
 
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::backup()
+void MainWindow::convertOldFile()
 {
-    char backuppath[255];
-    strcpy(backuppath, user.path);
-    strcat(backuppath, ".bak");
+    std::string buf;
+    #if (defined (_WIN32) || defined (_WIN64))
+        buf = getenv("APPDATA");
+        buf.append("\\passwordmanager");
+    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        buf = getenv("HOME");
+    #endif
 
-    ofstream file(backuppath);
+    QString filepath = QFileDialog::getOpenFileName(this, "Convert", QString(buf.c_str()), QString("Old Credentials Database (*.db)"));
 
-    for (unsigned int i = 0; i < lines; i++)
+    if (filepath.isEmpty())
+        return;
+
+    int areyousure = QMessageBox::warning(this, tr("Warning"), tr("The software will now attempt to convert this file to the new format.\n"
+                                                                    "This operation may fail if the file is malformed. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
+
+    if (areyousure == QMessageBox::No)
+        return;
+
+    std::fstream file(filepath.toStdString().c_str(), std::ios::in);
+    std::string templine;
+
+    lines = 0;
+    while(getline(file, templine))
+        lines++;
+
+    db = (DBRow *)calloc(lines, sizeof(DBRow));
+    if (db == NULL)
     {
-        file << db[i].id << "," << db[i].username << "," << db[i].purpose << "," << db[i].password << ",\n";
+        std::cout << "Heap allocation failed !" << std::endl;
+        exit(1);
     }
-
-    file.close();
-}
-
-void MainWindow::deleteRow()
-{
-    backup();
-
-    QItemSelectionModel* selection = table->selectionModel();
-
-    if (selection->hasSelection())
+    else
     {
-       int areyousure = QMessageBox::warning(this, tr("Warning"), tr("This will delete the entire row from the database.\n"
-                                                                        "This operation is not recoverable. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
+        file.close();
+        file.open(filepath.toStdString().c_str(), std::ios::in);
 
-        if (areyousure == QMessageBox::No)
-            return;
-        else
+        for (unsigned int i = 0; i < lines; i++)
         {
-            unsigned int i = table->selectionModel()->currentIndex().row();
+            DBRow buffer;
 
-            //Create db array of size n-1
-            DBRow* temparray = (DBRow *)calloc(lines-1, sizeof(DBRow));
+            getline(file, templine);
 
-            //Copy current db to temporary array except the line to be deleted
-            int k = 0;
-            for (unsigned int j = 0; j < lines; j++)
-            {
-                if (j != i)
-                {
-                    temparray[k] = db[j];
-                    k++;
-                }
-            }
+            char delimiter = ',';
+            int pos = 0;
 
-            //Downsize actual db
-            lines--;
-            db = (DBRow *)realloc(db, sizeof(DBRow) * lines);   //Realloc doesn't keep array contents, hence why we store the db in a temp array
+            std::string token = templine.substr(0, templine.find(delimiter));
+            pos = templine.find(delimiter, pos) + 1;
 
-            //Copy back everything into the database
-            for (unsigned int j = 0; j < lines; j++)
-            {
-                db[j] = temparray[j];
-            }
+            token = templine.substr(pos, templine.find(delimiter, pos)-pos);
+            buffer.username = token;
+            pos = templine.find(delimiter, pos) + 1;
 
-            //Adjust row id starting from where the now deleted line used to be
-            for (unsigned int j = i; j < lines; j++)
-                db[j].id--;
+            token = templine.substr(pos, templine.find(delimiter, pos)-pos);
+            buffer.purpose = token;
+            pos = templine.find(delimiter, pos) + 1;
+
+            token = templine.substr(pos, templine.find(delimiter, pos)-pos);
+            buffer.password = token;
+            pos = templine.find(delimiter, pos) + 1;
+
+            db[i] = buffer;
         }
-    }
 
-    //Finally, write db to file and present view to the user
-    writeToFile();
-    refreshView();
-}
-
-void MainWindow::edit()
-{
-    backup();
-    QItemSelectionModel* selection = table->selectionModel();
-
-    if (selection->hasSelection())
-    {
-       int i = table->selectionModel()->currentIndex().row();
-       int j = table->selectionModel()->currentIndex().column();
-
-       QString textbuffer = table->model()->data(table->model()->index(i, j)).toString();
-       bool proceed = true;
-
-       switch (j)
-       {
-       case 0:
-           db[i].username = (char *)QInputDialog::getText(this, tr("Edit"), "Enter a new username:", QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString().c_str();
-           break;
-       case 1:
-           db[i].purpose = (char *)QInputDialog::getText(this, tr("Edit"), "Enter what these credentials will be used for:", QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString().c_str();
-           break;
-       case 2:
-           newPassword = new MiniGenerateBox(i, db[i].password);
-           QWidget::connect(newPassword, SIGNAL(returnPassword(uint,const char*)), this, SLOT(setNewPassword(uint,const char*)));
-           newPassword->exec();
-           break;
-       }
-
-       if (strcmp(db[i].username, "") == 0)
-           strcpy(db[i].username, "<none>");
-
-       if (strcmp(db[i].purpose, "") == 0)
-           strcpy(db[i].purpose, "<none>");
-
-       if (strcmp(db[i].password, "") == 0)
-           strcpy(db[i].password, "<none>");
-
-       if (proceed == false)
-           return;
-    }
-
-    writeToFile();
-    refreshView();
-}
-
-void MainWindow::copy()
-{
-    QItemSelectionModel* selection = table->selectionModel();
-
-    if (selection->hasSelection())
-    {
-        int i = table->selectionModel()->currentIndex().row();
-
-        QClipboard* clipboard = QApplication::clipboard();
-        clipboard->setText(QString(table->model()->data(table->model()->index(i, 3)).toString()));
-
-        stringstream statusbuffer;
-        statusbuffer << tr("Copied password from row ").toStdString() << i+1 << tr(" to clipboard").toStdString();
-
-        status->setText(QString(statusbuffer.str().c_str()));
+        writeToFile();
+        refreshView();
     }
 }

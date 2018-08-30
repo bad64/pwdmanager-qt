@@ -8,7 +8,7 @@ class MiniGenerateBox : public QDialog
     Q_OBJECT
 
 public:
-    MiniGenerateBox(int nline, char* oldpw);
+    MiniGenerateBox(int nline, std::string oldpw);
 
 public slots:
     void requestGenerate();
@@ -16,11 +16,11 @@ public slots:
     void quit();
 
 signals:
-    void returnPassword(unsigned int line, const char* password);
+    void returnPassword(unsigned int line, std::string password);
 
 private:
     int line;
-    char* oldpassword;
+    std::string oldpassword;
 
     //Layouts
     QVBoxLayout* mainLayout;

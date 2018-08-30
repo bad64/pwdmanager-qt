@@ -6,6 +6,9 @@ MainWindow::MainWindow()
     QWidget::setWindowTitle("Password Manager");
     setCentralWidget(mainArea);
 
+    hide = false;
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this, SLOT(hideTable()));
+
     //Prepping the database
     db = (DBRow *)calloc(0, sizeof(DBRow));
     lines = 0;
@@ -19,6 +22,14 @@ MainWindow::MainWindow()
         QAction* actionExport = new QAction(tr("Export"), this);
         optionFile->addAction(actionExport);
         QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(exportToFile()));
+
+        QAction* actionRestore = new QAction(tr("Restore from backup"), this);
+        optionFile->addAction(actionRestore);
+        QObject::connect(actionRestore, SIGNAL(triggered()), this, SLOT(restore()));
+
+        QAction* actionConvert = new QAction(tr("Convert old file"), this);
+        optionFile->addAction(actionConvert);
+        QObject::connect(actionConvert, SIGNAL(triggered()), this, SLOT(convertOldFile()));
 
         QAction* actionRefresh = new QAction(tr("Refresh View"), this);
         actionRefresh->setShortcut(Qt::Key_F5);
@@ -45,6 +56,16 @@ MainWindow::MainWindow()
         QAction* actionCopy = new QAction(tr("Copy password"), this);
         optionEdit->addAction(actionCopy);
         QObject::connect(actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
+
+        QAction* actionMoveRowUp = new QAction(tr("Move row up"), this);
+        optionEdit->addAction(actionMoveRowUp);
+        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this, SLOT(moveRowUp()));
+        QObject::connect(actionMoveRowUp, SIGNAL(triggered()), this, SLOT(moveRowUp()));
+
+        QAction* actionMoveRowDown = new QAction(tr("Move row down"), this);
+        optionEdit->addAction(actionMoveRowDown);
+        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this, SLOT(moveRowDown()));
+        QObject::connect(actionMoveRowDown, SIGNAL(triggered()), this, SLOT(moveRowDown()));
 
     QMenu* optionMisc = menuBar()->addMenu("?");
         QAction* actionHelp = new QAction(tr("Help"), this);
@@ -158,21 +179,58 @@ void MainWindow::init()
     {
         table->insertRow(table->rowCount());
 
-        table->setItem(i, 0, new QTableWidgetItem(db[i].username));
-        table->setItem(i, 1, new QTableWidgetItem(db[i].purpose));
-        table->setItem(i, 2, new QTableWidgetItem(db[i].password));
+        table->setItem(i, 0, new QTableWidgetItem(db[i].username.c_str()));
+        table->setItem(i, 1, new QTableWidgetItem(db[i].purpose.c_str()));
+        table->setItem(i, 2, new QTableWidgetItem(db[i].password.c_str()));
     }
 
     std::stringstream statusbuffer;
-
     if (lines == 0)
         statusbuffer << tr("Retrieved 0 entries.").toStdString();
     else if (lines == 1)
         statusbuffer << tr("Retrieved 1 entry.").toStdString();
-    else
-        statusbuffer << tr("Retrieved ").toStdString() << lines << tr(" entries.").toStdString();
+    else if (lines > 1)
+        statusbuffer << tr("Retrieved ").toStdString().c_str() << lines << tr(" entries.").toStdString().c_str();
+}
 
-    status->setText(QString(statusbuffer.str().c_str()));
+void MainWindow::hideTable()
+{
+    if (hide)
+    {
+        if (askUserPassword() == 1)
+        {
+            hide = false;
+            refreshView();
+            search();
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        hide = true;
+
+        refreshView();
+        search();
+
+        std::stringstream statusbuffer;
+
+        if (hide)
+            statusbuffer << tr("Hidden table view.\nPress Ctrl+H to unhide").toStdString().c_str();
+        else
+        {
+            if (lines == 0)
+                statusbuffer << tr("Retrieved 0 entries.").toStdString();
+            else if (lines == 1)
+                statusbuffer << tr("Retrieved 1 entry.").toStdString();
+            else if (lines > 1)
+                statusbuffer << tr("Retrieved ").toStdString().c_str() << lines << tr(" entries.").toStdString().c_str();
+        }
+
+        status->setText(QString(statusbuffer.str().c_str()));
+    }
 }
 
 void MainWindow::refreshView()
@@ -181,99 +239,130 @@ void MainWindow::refreshView()
 
     table->setRowCount(0);
 
-    for (unsigned int i = 0; i < lines; i++)
-    {
-        table->insertRow(table->rowCount());
-
-        table->setItem(i, 0, new QTableWidgetItem(db[i].username));
-        table->setItem(i, 1, new QTableWidgetItem(db[i].purpose));
-        table->setItem(i, 2, new QTableWidgetItem(db[i].password));
-    }
-}
-
-void MainWindow::search()
-{
-    table->setRowCount(0);
-
-    if (searchBox->text().isEmpty())
+    if (!hide)
     {
         for (unsigned int i = 0; i < lines; i++)
         {
             table->insertRow(table->rowCount());
 
-            table->setItem(i, 0, new QTableWidgetItem(db[i].username));
-            table->setItem(i, 1, new QTableWidgetItem(db[i].purpose));
-            table->setItem(i, 2, new QTableWidgetItem(db[i].password));
+            table->setItem(i, 0, new QTableWidgetItem(db[i].username.c_str()));
+            table->setItem(i, 1, new QTableWidgetItem(db[i].purpose.c_str()));
+            table->setItem(i, 2, new QTableWidgetItem(db[i].password.c_str()));
         }
-
-        std::stringstream statusbuffer;        
-        statusbuffer << tr("Retrieved ").toStdString() << lines << tr(" entries.").toStdString();
-
-        status->setText(QString(statusbuffer.str().c_str()));
     }
     else
     {
-        if (!exactMatch->isChecked())
+        for (unsigned int i = 0; i < lines; i++)
         {
-            QRegularExpression regex(searchBox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
+            table->insertRow(table->rowCount());
 
-            int j = 0;
-            for (unsigned int i = 0; i < lines; i++)
+            table->setItem(i, 0, new QTableWidgetItem(""));
+            table->setItem(i, 1, new QTableWidgetItem(""));
+            table->setItem(i, 2, new QTableWidgetItem(""));
+        }
+    }
+}
+
+void MainWindow::search()
+{
+    if (!hide)  //Disallow search if table is hidden
+    {
+        table->setRowCount(0);
+
+        if (searchBox->text().isEmpty())
+        {
+            if (!hide)
             {
-                QRegularExpressionMatch usernameMatch = regex.match(db[i].username);
-                QRegularExpressionMatch purposeMatch = regex.match(db[i].purpose);
-                QRegularExpressionMatch passwordMatch = regex.match(db[i].password);
-
-                if ((usernameMatch.hasMatch()) || (purposeMatch.hasMatch()) || (passwordMatch.hasMatch()))
+                for (unsigned int i = 0; i < lines; i++)
                 {
                     table->insertRow(table->rowCount());
 
-                    table->setItem(j, 0, new QTableWidgetItem(db[i].username));
-                    table->setItem(j, 1, new QTableWidgetItem(db[i].purpose));
-                    table->setItem(j, 2, new QTableWidgetItem(db[i].password));
-                    j++;
+                    table->setItem(i, 0, new QTableWidgetItem(db[i].username.c_str()));
+                    table->setItem(i, 1, new QTableWidgetItem(db[i].purpose.c_str()));
+                    table->setItem(i, 2, new QTableWidgetItem(db[i].password.c_str()));
+                }
+            }
+            else
+            {
+                for (unsigned int i = 0; i < lines; i++)
+                {
+                    table->insertRow(table->rowCount());
+
+                    table->setItem(i, 0, new QTableWidgetItem(""));
+                    table->setItem(i, 1, new QTableWidgetItem(""));
+                    table->setItem(i, 2, new QTableWidgetItem(""));
                 }
             }
 
-            //Write query results to status
             std::stringstream statusbuffer;
-
-            if (table->rowCount() == 0)
-                statusbuffer << tr("No matches found.").toStdString();
-            else if (table->rowCount() == 1)
-                statusbuffer << tr("Found 1 match.").toStdString();
-            else
-                statusbuffer << tr("Found ").toStdString() << table->rowCount() << tr(" matches.").toStdString();
+            statusbuffer << tr("Retrieved ").toStdString() << lines << tr(" entries.").toStdString();
 
             status->setText(QString(statusbuffer.str().c_str()));
         }
         else
         {
-            int j = 0;
-            for (unsigned int i = 0; i < lines; i++)
+            if (!exactMatch->isChecked())
             {
-                if ((strcmp(searchBox->text().toStdString().c_str(), db[i].username) == 0) || (strcmp(searchBox->text().toStdString().c_str(), db[i].purpose) == 0) || (strcmp(searchBox->text().toStdString().c_str(), db[i].password) == 0))
+                QRegularExpression regex(searchBox->text().toStdString().c_str(), QRegularExpression::CaseInsensitiveOption);
+
+                int j = 0;
+                for (unsigned int i = 0; i < lines; i++)
                 {
-                    table->insertRow(table->rowCount());
+                    QRegularExpressionMatch usernameMatch = regex.match(db[i].username.c_str());
+                    QRegularExpressionMatch purposeMatch = regex.match(db[i].purpose.c_str());
+                    QRegularExpressionMatch passwordMatch = regex.match(db[i].password.c_str());
 
-                    table->setItem(j, 0, new QTableWidgetItem(db[i].username));
-                    table->setItem(j, 1, new QTableWidgetItem(db[i].purpose));
-                    table->setItem(j, 2, new QTableWidgetItem(db[i].password));
-                    j++;
+                    if ((usernameMatch.hasMatch()) || (purposeMatch.hasMatch()) || (passwordMatch.hasMatch()))
+                    {
+                        table->insertRow(table->rowCount());
+
+                        table->setItem(j, 0, new QTableWidgetItem(db[i].username.c_str()));
+                        table->setItem(j, 1, new QTableWidgetItem(db[i].purpose.c_str()));
+                        table->setItem(j, 2, new QTableWidgetItem(db[i].password.c_str()));
+                        j++;
+                    }
                 }
+
+                //Write query results to status
+                std::stringstream statusbuffer;
+
+                if (table->rowCount() == 0)
+                    statusbuffer << tr("No matches found.").toStdString();
+                else if (table->rowCount() == 1)
+                    statusbuffer << tr("Found 1 match.").toStdString();
+                else
+                    statusbuffer << tr("Found ").toStdString() << table->rowCount() << tr(" matches.").toStdString();
+
+                status->setText(QString(statusbuffer.str().c_str()));
             }
-
-            //Write query results to status
-            std::stringstream statusbuffer;
-
-            if (table->rowCount() == 0)
-                statusbuffer << tr("No matches found.").toStdString();
-            else if (table->rowCount() == 1)
-                statusbuffer << tr("Found 1 match.").toStdString();
             else
-                statusbuffer << tr("Found ").toStdString() << table->rowCount() << tr(" matches.").toStdString();
+            {
+                int j = 0;
+                for (unsigned int i = 0; i < lines; i++)
+                {
+                    if ((strcmp(searchBox->text().toStdString().c_str(), db[i].username.c_str()) == 0) || (strcmp(searchBox->text().toStdString().c_str(), db[i].purpose.c_str()) == 0) || (strcmp(searchBox->text().toStdString().c_str(), db[i].password.c_str()) == 0))
+                    {
+                        table->insertRow(table->rowCount());
 
-            status->setText(QString(statusbuffer.str().c_str()));
+                        table->setItem(j, 0, new QTableWidgetItem(db[i].username.c_str()));
+                        table->setItem(j, 1, new QTableWidgetItem(db[i].purpose.c_str()));
+                        table->setItem(j, 2, new QTableWidgetItem(db[i].password.c_str()));
+                        j++;
+                    }
+                }
+
+                //Write query results to status
+                std::stringstream statusbuffer;
+
+                if (table->rowCount() == 0)
+                    statusbuffer << tr("No matches found.").toStdString();
+                else if (table->rowCount() == 1)
+                    statusbuffer << tr("Found 1 match.").toStdString();
+                else
+                    statusbuffer << tr("Found ").toStdString() << table->rowCount() << tr(" matches.").toStdString();
+
+                status->setText(QString(statusbuffer.str().c_str()));
+            }
         }
     }
 }
