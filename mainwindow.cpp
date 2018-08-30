@@ -252,14 +252,10 @@ void MainWindow::refreshView()
     }
     else
     {
-        for (unsigned int i = 0; i < lines; i++)
-        {
-            table->insertRow(table->rowCount());
+        table->insertRow(table->rowCount());
 
-            table->setItem(i, 0, new QTableWidgetItem(""));
-            table->setItem(i, 1, new QTableWidgetItem(""));
-            table->setItem(i, 2, new QTableWidgetItem(""));
-        }
+        table->setItem(0, 0, new QTableWidgetItem(""));
+        table->setRowHeight(0, 0);
     }
 }
 
