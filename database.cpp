@@ -2,6 +2,14 @@
 
 using namespace std;
 
+class readEncryptedBufferException : public std::runtime_error
+{
+public:
+    readEncryptedBufferException(std::string const& msg):
+        std::runtime_error(msg)
+    {}
+};
+
 DBRow *MainWindow::readFromFile()
 {
     free(db);
@@ -81,45 +89,58 @@ DBRow *MainWindow::readFromFile()
             std::string encryptedbuf;
             file.get(buf);
 
-            for (unsigned int i = 0; i < lines; i++)
+            try
             {
-                while (buf != ',')
+                for (unsigned int i = 0; i < lines; i++)
                 {
-                    if (buf != ',')
-                        ssbuf << buf;
+                    while (buf != ',')
+                    {
+                        if (buf != ',')
+                            ssbuf << buf;
+                        file.get(buf);
+                    }
+
+                    encryptedbuf = xorCrypt(ssbuf.str());
+                    if (encryptedbuf.empty())
+                        throw readEncryptedBufferException("Error reading from file\n");
+                    db[i].username = encryptedbuf.c_str();
+                    ssbuf.str(std::string());
+                    file.get(buf);
+
+                    while (buf != ',')
+                    {
+                        if (buf != ',')
+                            ssbuf << buf;
+
+                        file.get(buf);
+                    }
+
+                    encryptedbuf = xorCrypt(ssbuf.str());
+                    if (encryptedbuf.empty())
+                        throw readEncryptedBufferException("Error reading from file\n");
+                    db[i].purpose = encryptedbuf.c_str();
+                    ssbuf.str(std::string());
+                    file.get(buf);
+
+                    while (buf != '\x01E')
+                    {
+                        if (buf != '\x01E')
+                            ssbuf << buf;
+                        file.get(buf);
+                    }
+
+                    encryptedbuf = xorCrypt(ssbuf.str());
+                    if (encryptedbuf.empty())
+                        throw readEncryptedBufferException("Error reading from file\n");
+                    db[i].password = encryptedbuf.c_str();
+                    ssbuf.str(std::string());
+
                     file.get(buf);
                 }
-
-                encryptedbuf = xorCrypt(ssbuf.str());
-                db[i].username = encryptedbuf.c_str();
-                ssbuf.str(std::string());
-                file.get(buf);
-
-                while (buf != ',')
-                {
-                    if (buf != ',')
-                        ssbuf << buf;
-
-                    file.get(buf);
-                }
-
-                encryptedbuf = xorCrypt(ssbuf.str());
-                db[i].purpose = encryptedbuf.c_str();
-                ssbuf.str(std::string());
-                file.get(buf);
-
-                while (buf != '\x01E')
-                {
-                    if (buf != '\x01E')
-                        ssbuf << buf;
-                    file.get(buf);
-                }
-
-                encryptedbuf = xorCrypt(ssbuf.str());
-                db[i].password = encryptedbuf.c_str();
-                ssbuf.str(std::string());
-
-                file.get(buf);
+            }
+            catch (std::exception &e)
+            {
+                restore();
             }
         }
     }
@@ -215,17 +236,21 @@ void MainWindow::edit()
            int j = table->selectionModel()->currentIndex().column();
 
            QString textbuffer = table->model()->data(table->model()->index(i, j)).toString();
+           std::string previousValue;
            bool proceed = true;
 
            switch (j)
            {
            case 0:
+               previousValue = db[i].username;
                db[i].username = QInputDialog::getText(this, tr("Edit"), tr("Enter a new username:"), QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString();
                break;
            case 1:
+               previousValue = db[i].purpose;
                db[i].purpose = QInputDialog::getText(this, tr("Edit"), tr("Enter what these credentials will be used for:"), QLineEdit::Normal, textbuffer, &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint).toStdString();
                break;
            case 2:
+               previousValue = db[i].password;
                newPassword = new MiniGenerateBox(i, db[i].password);
                QWidget::connect(newPassword, SIGNAL(returnPassword(uint, std::string)), this, SLOT(setNewPassword(uint, std::string)));
                newPassword->exec();
@@ -233,7 +258,21 @@ void MainWindow::edit()
            }
 
            if (proceed == false)
-               return;
+           {
+               switch (j)
+               {
+               case 0:
+                   db[i].username = previousValue;
+                   break;
+               case 1:
+                   db[i].purpose = previousValue;
+                   break;
+               case 2:
+                   //Should not be reachable due to how MiniGenerateBox works, but just in case
+                   db[i].password = previousValue;
+                   break;
+               }
+           }
            else
            {
                if (db[i].username.empty())

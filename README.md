@@ -4,7 +4,7 @@ A large(ish) rework of my console-only multiplatform password manager that you c
 
 Made with Qt 5.10. It has a couple more functions than its console counterpart, like editing database rows, or cross-platform copy to clipboard.
 
-# Latest update: v2.1, 30/08/18
+# Latest update: v2.1, 31/08/18 (not ready for release yet)
 
 **CODE CHANGES**
 
@@ -13,7 +13,7 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 - All: Added sanity checks when importing a database file.
 - All: Added a launch option to set language, independently of OS language settings. Since the code is only translated in French at the moment, it only works with French.
 
-**FEATURES**
+**NEW FEATURES**
 
 - All: New file format. A tool to convert the old database to the new format has been included.
 - All: Move rows up or down using Ctrl+up/down
@@ -24,6 +24,10 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 - Linux: Does not ask for password on unhide (see comments in askuserpassword.cpp for why it will probably not get fixed)
 
+**BUGFIXES**
+
+- All: Fixed a rare case where both the database and the backup can get corrupted if the user cancels a password edit MiniGenerateBox
+
 **TO DO**
 
 - Maybe an icon ?
@@ -33,9 +37,9 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 **Not available yet. Those are for 2.0**
 
 **WINDOWS**  
-[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-v2.1-windows-setup.exe)  
-[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-v2.1-windows.zip)
+[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows-setup.exe)  
+[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows.zip)
 
 **LINUX**  
 Linux version depends on Qt5. Installer script itself requires dialog and sudo privileges.  
-[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-v2.1-linux.zip)
+[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-linux.zip)

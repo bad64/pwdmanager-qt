@@ -70,6 +70,6 @@ void MiniGenerateBox::requestGenerate()
 
 void MiniGenerateBox::quit()
 {
-    emit returnPassword(line, oldpassword);
+    emit returnPassword(line, oldpassword.c_str());
     this->close();
 }
