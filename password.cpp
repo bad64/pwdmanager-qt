@@ -76,7 +76,4 @@ void MainWindow::addRow(std::string n_username, std::string n_purpose, std::stri
 void MainWindow::setNewPassword(unsigned int line, std::string n_password)
 {
     db[line].password = n_password;
-
-    writeToFile();
-    refreshView();
 }
