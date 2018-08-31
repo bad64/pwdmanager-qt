@@ -4,6 +4,7 @@
 - All: Moved some functions around for better file organization. Also function definitions roughly match the order used in mainwindow.h.
 - All: Added sanity checks when importing a database file.
 - All: Added a launch option to set language, independently of OS language settings. Since the code is only translated in French at the moment, it only works with French.
+- Linux: Moved translations to /usr/share (from /usr/local/share)
 
 **New features**
 
