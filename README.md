@@ -34,12 +34,19 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 # Download links
 
-**Not available yet. Those are for 2.0**
+**BUILDING FROM SOURCES**
 
-**WINDOWS**  
-[Windows Installer](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows-setup.exe)  
-[Windows ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-windows.zip)
+*Please note: You will need the Qt framework to build this software.*
 
-**LINUX**  
-Linux version depends on Qt5. Installer script itself requires dialog and sudo privileges.  
-[Linux ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.0/pwdmanager-qt-v2.0-linux.zip)
+Start off by cloning the repo. Navigate into the created folder through your console of choice, then;
+
+To build on Windows: path\to\qmake.exe && mingw32-make && mingw32-make clean (or use Qt Creator. Your call)  
+To build on Linux: qmake && make && sudo make install && make clean
+
+**PRECOMPILED BINARIES**
+
+[WINDOWS ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-2.1-windows.zip)  
+[WINDOWS INSTALLER](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-2.1-windows-setup.exe)
+
+*Please note: This package depends on libqt5core5a, libqt5gui5, and libqt5widgets5.*
+[LINUX DEB](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt_amd64.deb)
