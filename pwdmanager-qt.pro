@@ -1,3 +1,36 @@
+win32 {
+    Release:DESTDIR = release-win32
+    Release:OBJECTS_DIR = release-win32/obj/.obj
+    Release:MOC_DIR = release-win32/moc/.moc
+    Release:RCC_DIR = release-win32/rcc/.rcc
+    Release:UI_DIR = release-win32/ui/.ui
+
+    Debug:DESTDIR = debug-win32
+    Debug:OBJECTS_DIR = debug-win32/obj/.obj
+    Debug:MOC_DIR = debug-win32/moc/.moc
+    Debug:RCC_DIR = debug-win32/rcc/.rcc
+    Debug:UI_DIR = debug-win32/ui/.ui
+}
+
+unix:!macx {
+    Release:DESTDIR = release-win32
+    Release:OBJECTS_DIR = release-win32/obj/.obj
+    Release:MOC_DIR = release-win32/moc/.moc
+    Release:RCC_DIR = release-win32/rcc/.rcc
+    Release:UI_DIR = release-win32/ui/.ui
+
+    Debug:DESTDIR = debug-win32
+    Debug:OBJECTS_DIR = debug-win32/obj/.obj
+    Debug:MOC_DIR = debug-win32/moc/.moc
+    Debug:RCC_DIR = debug-win32/rcc/.rcc
+    Debug:UI_DIR = debug-win32/ui/.ui
+
+    languagefiles.path = /usr/local/share/pwdmanager-qt/translations
+    languagefiles.files = src/translations/*
+
+    target.path = /usr/local/bin
+}
+
 QT += widgets
 
 HEADERS += \
@@ -22,30 +55,7 @@ SOURCES += \
 TRANSLATIONS += \
     translations/pwdmanager-qt_fr.ts
 
-win32 {
-    Release:DESTDIR = bin/release-win32
-    Release:OBJECTS_DIR = bin/release-win32/obj/.obj
-    Release:MOC_DIR = bin/release-win32/moc/.moc
-    Release:RCC_DIR = bin/release-win32/rcc/.rcc
-    Release:UI_DIR = bin/release-win32/ui/.ui
-
-    Debug:DESTDIR = bin/debug-win32
-    Debug:OBJECTS_DIR = bin/debug-win32/obj/.obj
-    Debug:MOC_DIR = bin/debug-win32/moc/.moc
-    Debug:RCC_DIR = bin/debug-win32/rcc/.rcc
-    Debug:UI_DIR = bin/debug-win32/ui/.ui
-}
-
 unix:!macx {
-    Release:DESTDIR = bin/release-win32
-    Release:OBJECTS_DIR = bin/release-win32/obj/.obj
-    Release:MOC_DIR = bin/release-win32/moc/.moc
-    Release:RCC_DIR = bin/release-win32/rcc/.rcc
-    Release:UI_DIR = bin/release-win32/ui/.ui
-
-    Debug:DESTDIR = bin/debug-win32
-    Debug:OBJECTS_DIR = bin/debug-win32/obj/.obj
-    Debug:MOC_DIR = bin/debug-win32/moc/.moc
-    Debug:RCC_DIR = bin/debug-win32/rcc/.rcc
-    Debug:UI_DIR = bin/debug-win32/ui/.ui
+    INSTALLS += target \
+                languagefiles
 }

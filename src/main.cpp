@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         translator.load(QString("translations\\pwdmanager-qt_") + locale);
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
         if(!translator.load(QString("/usr/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale))
-            translator.load(QString("/usr/local/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale)
+            translator.load(QString("/usr/local/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale);
     #endif
     app.installTranslator(&translator);
 
