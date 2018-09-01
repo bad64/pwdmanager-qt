@@ -36,7 +36,7 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 **BUILDING FROM SOURCES**
 
-*Please note: You will need the Qt framework to build this software.*
+*Please note: You will need the Qt framework to build this software.*  
 Start off by cloning the repo. Navigate into the created folder through your console of choice, then;
 
 - To build on Windows: path\to\qmake.exe && mingw32-make && mingw32-make clean (or use Qt Creator. Your call)  
