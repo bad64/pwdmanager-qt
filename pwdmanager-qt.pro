@@ -1,35 +1,31 @@
-win32 {
-    Release:DESTDIR = release-win32
-    Release:OBJECTS_DIR = release-win32/obj/.obj
-    Release:MOC_DIR = release-win32/moc/.moc
-    Release:RCC_DIR = release-win32/rcc/.rcc
-    Release:UI_DIR = release-win32/ui/.ui
+CONFIG -= debug_and_release
+CONFIG += release
 
-    Debug:DESTDIR = debug-win32
-    Debug:OBJECTS_DIR = debug-win32/obj/.obj
-    Debug:MOC_DIR = debug-win32/moc/.moc
-    Debug:RCC_DIR = debug-win32/rcc/.rcc
-    Debug:UI_DIR = debug-win32/ui/.ui
+win32 {
+    DESTDIR = bin/win32
+    OBJECTS_DIR = bin/win32/obj/
+    MOC_DIR = bin/win32/moc/
+    RCC_DIR = bin/win32/rcc/
+    UI_DIR = bin/win32/ui/
 }
 
 unix:!macx {
-    Release:DESTDIR = release-win32
-    Release:OBJECTS_DIR = release-win32/obj/.obj
-    Release:MOC_DIR = release-win32/moc/.moc
-    Release:RCC_DIR = release-win32/rcc/.rcc
-    Release:UI_DIR = release-win32/ui/.ui
-
-    Debug:DESTDIR = debug-win32
-    Debug:OBJECTS_DIR = debug-win32/obj/.obj
-    Debug:MOC_DIR = debug-win32/moc/.moc
-    Debug:RCC_DIR = debug-win32/rcc/.rcc
-    Debug:UI_DIR = debug-win32/ui/.ui
+    DESTDIR = bin/linux
+    OBJECTS_DIR = bin/linux/obj/
+    MOC_DIR = bin/linux/moc/
+    RCC_DIR = bin/linux/rcc/
+    UI_DIR = bin/linux/ui/
 
     languagefiles.path = /usr/local/share/pwdmanager-qt/translations
-    languagefiles.files = src/translations/*
+    languagefiles.files = src/translations/*.qm
 
     target.path = /usr/local/bin
+
+    INSTALLS += target \
+                languagefiles
 }
+
+QMAKE_CLEAN += object_script.* Makefile .qmake.stash
 
 QT += widgets
 
@@ -53,9 +49,4 @@ SOURCES += \
     src/askuserpassword.cpp
 
 TRANSLATIONS += \
-    translations/pwdmanager-qt_fr.ts
-
-unix:!macx {
-    INSTALLS += target \
-                languagefiles
-}
+    src/translations/pwdmanager-qt_fr.ts
