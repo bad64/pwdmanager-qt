@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
     #if (defined (_WIN32) || defined (_WIN64))
         translator.load(QString("translations\\pwdmanager-qt_") + locale);
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
-        translator.load(QString("/usr/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale);
+        if(!translator.load(QString("/usr/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale))
+            translator.load(QString("/usr/local/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale)
     #endif
     app.installTranslator(&translator);
 
