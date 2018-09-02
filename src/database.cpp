@@ -443,7 +443,7 @@ void MainWindow::importFromFile()
     }
 
     fstream originalfile(user.path, ios::out | ios::binary);
-    originalfile << newfile.rdbuf();
+    originalfile << '\x001' << newfile.rdbuf();
 
     newfile.close();
     originalfile.close();
