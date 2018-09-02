@@ -16,6 +16,7 @@
 **Bugfixes**
 
 - All: Fixed a rare case where both the database and the backup can get corrupted if the user cancels a password edit MiniGenerateBox
+- All: Fixed a bug with imports not reading the first character of the header correctly
 
 **Known issues**
 
