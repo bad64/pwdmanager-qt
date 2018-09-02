@@ -44,8 +44,8 @@ Start off by cloning the repo. Navigate into the created folder through your con
 
 **PRECOMPILED BINARIES**
 
-[WINDOWS ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-2.1-windows.zip)  
-[WINDOWS INSTALLER](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-2.1-windows-setup.exe)
+[WINDOWS ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-2.1.1-windows.zip)  
+[WINDOWS INSTALLER](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt-2.1.1-windows-setup.exe)
 
 *Please note: This package depends on libqt5core5a, libqt5gui5, and libqt5widgets5.*  
 [LINUX DEB](https://github.com/bad64/pwdmanager-qt/releases/download/v2.1/pwdmanager-qt_amd64.deb)
