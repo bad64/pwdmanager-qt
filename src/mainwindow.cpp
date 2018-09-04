@@ -5,6 +5,7 @@ MainWindow::MainWindow()
     QWidget* mainArea = new QWidget;
     QWidget::setWindowTitle("Password Manager");
     setCentralWidget(mainArea);
+    this->setWindowIcon(QIcon(":/resources/pwdmanager-qt.png"));
 
     hide = false;
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this, SLOT(hideTable()));
