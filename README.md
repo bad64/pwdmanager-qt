@@ -28,10 +28,6 @@ Made with Qt 5.10. It has a couple more functions than its console counterpart, 
 
 - All: Fixed a rare case where both the database and the backup can get corrupted if the user cancels a password edit MiniGenerateBox
 
-**TO DO**
-
-- Maybe an icon ?
-
 # Download links
 
 **BUILDING FROM SOURCES**
