@@ -1,2 +1,5 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<!DOCTYPE RCC><RCC>
+    <qresource prefix="/">
+        <file>resources/pwdmanager-qt.png</file>
+    </qresource>
+</RCC>
