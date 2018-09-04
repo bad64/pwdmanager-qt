@@ -365,7 +365,7 @@ Dans le cas  où une transaction serait interrompue (par exemple dû à une pann
         <location filename="../misc.cpp" line="21"/>
         <source> by Lou VINCENT aka Bad64.
 </source>
-        <translation>par Lou VINCENT aka Bad64.
+        <translation type="unfinished"> par Lou VINCENT aka Bad64.
 </translation>
     </message>
     <message>
