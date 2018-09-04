@@ -1,12 +1,17 @@
 CONFIG -= debug_and_release
 CONFIG += release
 
+win32:VERSION = 2.1.2.4
+else:VERSION = 2.1.2
+
 win32 {
     DESTDIR = bin/win32
     OBJECTS_DIR = bin/win32/obj/
     MOC_DIR = bin/win32/moc/
     RCC_DIR = bin/win32/rcc/
     UI_DIR = bin/win32/ui/
+
+    RC_ICONS = src/resources/pwdmanager-qt.ico
 }
 
 unix:!macx {
@@ -20,6 +25,9 @@ unix:!macx {
     languagefiles.files = src/translations/*.qm
 
     target.path = /usr/local/bin
+
+    icon.path = /usr/share/pixmaps
+    icon.files = src/resources/pwdmanager-qt.png
 
     INSTALLS += target \
                 languagefiles
@@ -50,3 +58,6 @@ SOURCES += \
 
 TRANSLATIONS += \
     src/translations/pwdmanager-qt_fr.ts
+
+RESOURCES += \
+    src/resources.qrc
