@@ -15,66 +15,35 @@ MainWindow::MainWindow()
     lines = 0;
 
     //Menu bar
-    QMenu* optionFile = menuBar()->addMenu(tr("&File"));
-        QAction* actionImport = new QAction(tr("Import"), this);
+    QMenu *optionFile = menuBar()->addMenu(tr("&File"));
+        QAction *actionImport = new QAction(tr("Import"), this);
         optionFile->addAction(actionImport);
         QObject::connect(actionImport, SIGNAL(triggered()), this, SLOT(importFromFile()));
 
-        QAction* actionExport = new QAction(tr("Export"), this);
+        QAction *actionExport = new QAction(tr("Export"), this);
         optionFile->addAction(actionExport);
         QObject::connect(actionExport, SIGNAL(triggered()), this, SLOT(exportToFile()));
 
-        QAction* actionRestore = new QAction(tr("Restore from backup"), this);
+        QAction *actionRestore = new QAction(tr("Restore from backup"), this);
         optionFile->addAction(actionRestore);
         QObject::connect(actionRestore, SIGNAL(triggered()), this, SLOT(restore()));
 
-        QAction* actionConvert = new QAction(tr("Convert old file"), this);
-        optionFile->addAction(actionConvert);
-        QObject::connect(actionConvert, SIGNAL(triggered()), this, SLOT(convertOldFile()));
-
-        QAction* actionRefresh = new QAction(tr("Refresh View"), this);
+        QAction *actionRefresh = new QAction(tr("Refresh View"), this);
         actionRefresh->setShortcut(Qt::Key_F5);
         optionFile->addAction(actionRefresh);
         QObject::connect(actionRefresh, SIGNAL(triggered()), this, SLOT(refreshView()));
 
-        QAction* actionQuit = new QAction(tr("Quit"), this);
+        QAction *actionQuit = new QAction(tr("Quit"), this);
         optionFile->addAction(actionQuit);
         QObject::connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    QMenu* optionEdit = menuBar()->addMenu(tr("&Edit"));
-        QAction* actionNew = new QAction(tr("New row"), this);
-        optionEdit->addAction(actionNew);
-        QObject::connect(actionNew, SIGNAL(triggered()), this, SLOT(newEntry()));
-
-        QAction* actionDelete = new QAction(tr("Delete row"), this);
-        optionEdit->addAction(actionDelete);
-        QObject::connect(actionDelete, SIGNAL(triggered()), this, SLOT(deleteRow()));
-
-        QAction* actionEdit = new QAction(tr("Edit cell content"), this);
-        optionEdit->addAction(actionEdit);
-        QObject::connect(actionEdit, SIGNAL(triggered()), this, SLOT(edit()));
-
-        QAction* actionCopy = new QAction(tr("Copy password"), this);
-        optionEdit->addAction(actionCopy);
-        QObject::connect(actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
-
-        QAction* actionMoveRowUp = new QAction(tr("Move row up"), this);
-        optionEdit->addAction(actionMoveRowUp);
-        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this, SLOT(moveRowUp()));
-        QObject::connect(actionMoveRowUp, SIGNAL(triggered()), this, SLOT(moveRowUp()));
-
-        QAction* actionMoveRowDown = new QAction(tr("Move row down"), this);
-        optionEdit->addAction(actionMoveRowDown);
-        new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this, SLOT(moveRowDown()));
-        QObject::connect(actionMoveRowDown, SIGNAL(triggered()), this, SLOT(moveRowDown()));
-
-    QMenu* optionMisc = menuBar()->addMenu("?");
-        QAction* actionHelp = new QAction(tr("Help"), this);
+    QMenu *optionMisc = menuBar()->addMenu("?");
+        QAction *actionHelp = new QAction(tr("Help"), this);
         actionHelp->setShortcut(Qt::Key_F1);
         optionMisc->addAction(actionHelp);
         QObject::connect(actionHelp, SIGNAL(triggered()), this, SLOT(help()));
 
-        QAction* actionAbout = new QAction(tr("About"), this);
+        QAction *actionAbout = new QAction(tr("About"), this);
         optionMisc->addAction(actionAbout);
         QObject::connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
 

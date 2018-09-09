@@ -235,6 +235,7 @@ void MainWindow::edit()
            int i = table->selectionModel()->currentIndex().row();
            int j = table->selectionModel()->currentIndex().column();
 
+
            QString textbuffer = table->model()->data(table->model()->index(i, j)).toString();
            std::string previousValue;
            bool proceed = true;
@@ -413,41 +414,52 @@ void MainWindow::importFromFile()
         buf = getenv("HOME");
     #endif
 
-    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf.c_str()), QString("Credentials Database (*.crbd)"));
+    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf.c_str()), QString("Credentials Database (*.crdb *.db);;All files (*.*)"));
 
     if (filepath.isEmpty())
         return;
 
-    int areyousure = QMessageBox::warning(this, tr("Warning"), tr("This will replace all entries in the current database with those of the imported database.\n"
-                                                                    "This operation is not recoverable. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
-
-    if (areyousure == QMessageBox::No)
-        return;
-
+    backup();
     free(db);
 
     fstream newfile(filepath.toStdString().c_str(), ios::in | ios::binary);
+    QFileInfo info(filepath);
+    QString ext = info.suffix();
 
     //Check if valid file
-    char nbuf;
-    newfile.get(nbuf);
-
-    if (nbuf != '\x001')
+    if ((ext == "crdb") || (ext == "bak"))
     {
-        QMessageBox::critical(this, tr("Invalid file"), tr("This file does not appear to be a valid .crdb file !"), QMessageBox::Ok);
+        char nbuf;
+        newfile.get(nbuf);
+
+        if (nbuf != '\x001')
+        {
+            QMessageBox::critical(this, tr("Invalid file"), tr("This file does not appear to be a valid file !"), QMessageBox::Ok);
+
+            newfile.close();
+            refreshView();
+
+            return;
+        }
+
+        int areyousure = QMessageBox::warning(this, tr("Warning"), tr("This will replace all entries in the current database with those of the imported database.\n"
+                                                                        "This operation is not recoverable. Do you wish to proceed ?"), QMessageBox::Yes | QMessageBox::No);
+
+        if (areyousure == QMessageBox::No)
+            return;
+
+        fstream originalfile(user.path, ios::out | ios::binary);
+        originalfile << '\x001' << newfile.rdbuf();
 
         newfile.close();
+        originalfile.close();
         refreshView();
-
-        return;
+    }
+    else if (ext == "db")
+    {
+        convertOldFile(filepath);
     }
 
-    fstream originalfile(user.path, ios::out | ios::binary);
-    originalfile << '\x001' << newfile.rdbuf();
-
-    newfile.close();
-    originalfile.close();
-    refreshView();
 }
 
 void MainWindow::exportToFile()
@@ -479,7 +491,7 @@ void MainWindow::exportToFile()
     status->setText(QString(statusbuffer.str().c_str()));
 }
 
-void MainWindow::convertOldFile()
+void MainWindow::convertOldFile(QString filepath)
 {
     std::string buf;
     #if (defined (_WIN32) || defined (_WIN64))
@@ -488,8 +500,6 @@ void MainWindow::convertOldFile()
     #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
         buf = getenv("HOME");
     #endif
-
-    QString filepath = QFileDialog::getOpenFileName(this, "Convert", QString(buf.c_str()), QString("Old Credentials Database (*.db)"));
 
     if (filepath.isEmpty())
         return;

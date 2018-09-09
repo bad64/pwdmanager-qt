@@ -1,5 +1,12 @@
 CONFIG -= debug_and_release
-CONFIG += release
+CONFIG += qt debug release
+
+CONFIG(debug)
+{
+    QMAKE_CXXFLAGS_DEBUG += /Zi
+    QMAKE_CXXFLAGS_DEBUG += /Od
+    QMAKE_LFLAGS_DEBUG += /DEBUG
+}
 
 win32:VERSION = 2.1.2.4
 else:VERSION = 2.1.2

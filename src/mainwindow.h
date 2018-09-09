@@ -32,7 +32,7 @@ public slots:
     void moveRowDown();
     void importFromFile();
     void exportToFile();
-    void convertOldFile();
+    void convertOldFile(QString filepath);
 
     //mainwindow.cpp
     void hideTable();
@@ -54,33 +54,33 @@ public slots:
 
 private:
     //Main window
-    QGridLayout* mainLayout;
-    QTableWidget* table;
+    QGridLayout *mainLayout;
+    QTableWidget *table;
 
-    QFrame* searchBoxFrame;
-    QVBoxLayout* searchBoxLayout;
-    QHBoxLayout* searchBoxSubLayout;
-    QLabel* searchBoxLabel;
-    QLineEdit* searchBox;
-    QCheckBox* exactMatch;
-    QPushButton* clearButton;
+    QFrame *searchBoxFrame;
+    QVBoxLayout *searchBoxLayout;
+    QHBoxLayout *searchBoxSubLayout;
+    QLabel *searchBoxLabel;
+    QLineEdit *searchBox;
+    QCheckBox *exactMatch;
+    QPushButton *clearButton;
 
-    QFrame* buttonsFrame;
-    QGridLayout* buttonsLayout;
-    QPushButton* newButton;
-    QPushButton* deleteButton;
-    QPushButton* editButton;
-    QPushButton* copyButton;
+    QFrame *buttonsFrame;
+    QGridLayout *buttonsLayout;
+    QPushButton *newButton;
+    QPushButton *deleteButton;
+    QPushButton *editButton;
+    QPushButton *copyButton;
 
-    QFrame* statusFrame;
-    QVBoxLayout* statusLayout;
-    QLabel* status;
+    QFrame *statusFrame;
+    QVBoxLayout *statusLayout;
+    QLabel *status;
 
     //User creation wizard
-    CreateUser* userWizard;
+    CreateUser *userWizard;
 
     //Password re-generator
-    MiniGenerateBox* newPassword;
+    MiniGenerateBox *newPassword;
 
     //Optical camouflage technology
     bool hide;
