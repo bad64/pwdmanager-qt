@@ -228,6 +228,7 @@ void MainWindow::edit()
                newPassword = new MiniGenerateBox(i, db[i].password);
                QWidget::connect(newPassword, SIGNAL(returnPassword(uint, std::string)), this, SLOT(setNewPassword(uint, std::string)));
                newPassword->exec();
+               delete newPassword;
                break;
             }
 

@@ -52,6 +52,8 @@ void MainWindow::newEntry()
         userWizard = new CreateUser();
         QWidget::connect(userWizard, SIGNAL(returnUserStruct(std::string, std::string, std::string)), this, SLOT(addRow(std::string, std::string, std::string)));
         userWizard->exec();
+
+        delete userWizard;
     }
 }
 
