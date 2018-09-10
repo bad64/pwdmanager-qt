@@ -11,7 +11,6 @@ MainWindow::MainWindow()
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this, SLOT(hideTable()));
 
     //Prepping the database
-    db = (DBRow *)calloc(0, sizeof(DBRow));
     lines = 0;
 
     //Menu bar
@@ -46,6 +45,10 @@ MainWindow::MainWindow()
         QAction *actionAbout = new QAction(tr("About"), this);
         optionMisc->addAction(actionAbout);
         QObject::connect(actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+
+    //Actions to move rows up/down
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up), this, SLOT(moveRowUp()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down), this, SLOT(moveRowDown()));
 
     //Main layout
     mainLayout = new QGridLayout;

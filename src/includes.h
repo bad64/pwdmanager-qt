@@ -7,10 +7,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define VERSION "2.1.3"
+#define VERSION "2.1.4"
 
 //Qt
 #include <QtWidgets>
@@ -35,6 +36,14 @@ struct DBRow
     std::string username;
     std::string purpose;
     std::string password;
+
+    DBRow()
+        : username("<none>"), purpose("<none>"), password("<none>")
+    {}
+
+    DBRow(std::string nusername, std::string npurpose, std::string npassword)
+        : username(nusername), purpose(npurpose), password(npassword)
+    {}
 };
 
 //seed.cpp

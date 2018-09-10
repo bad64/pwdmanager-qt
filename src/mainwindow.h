@@ -16,12 +16,12 @@ public:
     void init();
 
     User user;
-    DBRow* db;
+    std::vector<DBRow> db;
     unsigned int lines;
 
 public slots:
     //database.cpp
-    DBRow* readFromFile();
+    std::vector<DBRow> readFromFile();
     void writeToFile();
     void deleteRow();
     void edit();
@@ -42,7 +42,7 @@ public slots:
 
     //password.cpp (should probably be moved to database.cpp)
     void newEntry();
-    void addRow(std::string, std::string, std::string);
+    void addRow(std::string nusername, std::string npurpose, std::string npassword);
     void setNewPassword(unsigned int line, std::string);
 
     //askuserpassword.cpp

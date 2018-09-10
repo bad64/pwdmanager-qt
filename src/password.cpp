@@ -55,18 +55,9 @@ void MainWindow::newEntry()
     }
 }
 
-void MainWindow::addRow(std::string n_username, std::string n_purpose, std::string n_password)
+void MainWindow::addRow(std::string nusername, std::string npurpose, std::string npassword)
 {
-    DBRow* temp = db;
-
-    db = (DBRow *)calloc(lines+1, sizeof(DBRow));
-    for (unsigned int i = 0; i < lines; i++)
-        db[i] = temp[i];
-
-    db[lines].username = n_username;
-    db[lines].purpose = n_purpose;
-    db[lines].password = n_password;
-
+    db.emplace_back(nusername, npurpose, npassword);
     lines++;
 
     writeToFile();
