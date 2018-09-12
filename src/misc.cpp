@@ -1,24 +1,24 @@
 #include "mainwindow.h"
 
-void MainWindow::help()
+//Not part of the MainWindow namespace
+
+QString getURL(QString language)
 {
-    helpWizard = new HelpWindow(currentLanguage);
-    helpWizard->show();
+    //This is essentially a safety measure to avoid a crash in the event that the program runs in an untranslated language
+
+    struct stat buffer;
+    QString path = QString("help/" + language + "/index.html");
+
+    if (stat (path.toStdString().c_str(), &buffer) == 0)
+        return path;
+    else
+    {
+        std::cout << "Localized help for language " << language.toStdString() << " not found, defaulting to en" << std::endl;
+        return QString("help/en/index.html");
+    }
 }
 
-void MainWindow::about()
-{
-    std::stringstream aboutString;
-    aboutString << tr("pwdmanager-qt version ").toStdString() << VERSION << tr(" by Lou VINCENT aka Bad64.\n").toStdString();
-    aboutString << tr("Made with Qt ").toStdString() << qVersion() << tr(", with GCC version ").toStdString() << __VERSION__ << tr(", based on pwdmanager (also by Bad64).\n\n").toStdString();
-    aboutString << tr("This software is provided as-is, free of charge, for personal use.\n").toStdString();
-    aboutString << tr("Bad64 shall not be held responsible for passwords stolen by coworkers looking above one's shoulder, ").toStdString();
-    aboutString << tr("loss of important credentials, or broken coffee machines.").toStdString();
-
-    QMessageBox::about(this, tr("About"), aboutString.str().c_str());
-}
-
-int IsDir() //Not part of the MainWindow namespace
+int IsDir()
 {
     struct stat info;
 
@@ -73,4 +73,23 @@ std::string xorCrypt(std::string msg, std::string key)
     }
 
     return msg;
+}
+
+//More mainwindow namespace
+
+void MainWindow::help()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(getURL(currentLanguage)));
+}
+
+void MainWindow::about()
+{
+    std::stringstream aboutString;
+    aboutString << tr("pwdmanager-qt version ").toStdString() << VERSION << tr(" by Lou VINCENT aka Bad64.\n").toStdString();
+    aboutString << tr("Made with Qt ").toStdString() << qVersion() << tr(", with GCC version ").toStdString() << __VERSION__ << tr(", based on pwdmanager (also by Bad64).\n\n").toStdString();
+    aboutString << tr("This software is provided as-is, free of charge, for personal use.\n").toStdString();
+    aboutString << tr("Bad64 shall not be held responsible for passwords stolen by coworkers looking above one's shoulder, ").toStdString();
+    aboutString << tr("loss of important credentials, or broken coffee machines.").toStdString();
+
+    QMessageBox::about(this, tr("About"), aboutString.str().c_str());
 }
