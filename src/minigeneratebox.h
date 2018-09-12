@@ -9,6 +9,7 @@ class MiniGenerateBox : public QDialog
 
 public:
     MiniGenerateBox(int nline, std::string oldpw);
+    ~MiniGenerateBox();
 
 public slots:
     void requestGenerate();

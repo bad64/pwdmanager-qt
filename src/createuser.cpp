@@ -64,6 +64,11 @@ CreateUser::CreateUser()
     mainLayout->addLayout(dialogButtons);
 }
 
+CreateUser::~CreateUser()
+{
+
+}
+
 void CreateUser::validate()
 {
     if (usernameLine->text().isEmpty())

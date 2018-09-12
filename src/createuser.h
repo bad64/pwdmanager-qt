@@ -10,6 +10,7 @@ class CreateUser : public QDialog
 
 public:
     CreateUser();
+    ~CreateUser();
 
 public slots:
     void requestGenerate();

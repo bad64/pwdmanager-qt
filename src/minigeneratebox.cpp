@@ -54,6 +54,29 @@ MiniGenerateBox::MiniGenerateBox(int nline, std::string oldpw)
     mainLayout->addLayout(dialogButtons);
 }
 
+MiniGenerateBox::~MiniGenerateBox()
+{
+    delete cancelButton;
+    delete validateButton;
+
+    delete generateButton;
+    delete requiresSpecials;
+    delete requiresNumerals;
+    delete requiresCapitals;
+    delete requiredLength;
+    delete lengthLabel;
+    delete lengthLayout;
+
+    delete passwordLine;
+    delete passwordLabel;
+
+    delete dialogButtons;
+    delete generationOptions;
+    delete passwordLayout;
+
+    delete mainLayout;
+}
+
 void MiniGenerateBox::validate()
 {
     if (passwordLine->text().isEmpty())
