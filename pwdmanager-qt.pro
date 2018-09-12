@@ -1,15 +1,9 @@
 CONFIG -= debug_and_release
-CONFIG += qt debug release
+CONFIG += release
 
-CONFIG(debug)
-{
-    QMAKE_CXXFLAGS_DEBUG += /Zi
-    QMAKE_CXXFLAGS_DEBUG += /Od
-    QMAKE_LFLAGS_DEBUG += /DEBUG
-}
 
-win32:VERSION = 2.1.2.4
-else:VERSION = 2.1.2
+win32:VERSION = 2.2.0.0
+else:VERSION = 2.2.0
 
 win32 {
     DESTDIR = bin/win32
@@ -36,6 +30,9 @@ unix:!macx {
     icon.path = /usr/share/pixmaps
     icon.files = src/resources/pwdmanager-qt.png
 
+    help.path = /usr/local/share/pwdmanager-qt/help
+    help.files = src/help/*/*.html
+
     INSTALLS += target \
                 languagefiles
 }
@@ -49,7 +46,8 @@ HEADERS += \
     src/mainwindow.h \
     src/createuser.h \
     src/minigeneratebox.h \
-    src/credentialsfile.h
+    src/credentialsfile.h \
+    src/help.h
 
 SOURCES += \
     src/main.cpp \
@@ -61,7 +59,8 @@ SOURCES += \
     src/createuser.cpp \
     src/minigeneratebox.cpp \
     src/credentialsfile.cpp \
-    src/askuserpassword.cpp
+    src/askuserpassword.cpp \
+    src/help.cpp
 
 TRANSLATIONS += \
     src/translations/pwdmanager-qt_fr.ts

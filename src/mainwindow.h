@@ -5,6 +5,7 @@
 #include "createuser.h"
 #include "minigeneratebox.h"
 #include "credentialsfile.h"
+#include "help.h"
 #include <QtWidgets>
 
 class MainWindow : public QMainWindow
@@ -13,7 +14,9 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
+    ~MainWindow();
     void init();
+    void setLanguage(QString language);
 
     User user;
     std::vector<DBRow> db;
@@ -53,6 +56,8 @@ public slots:
     void about();
 
 private:
+    QString currentLanguage;
+
     //Main window
     QGridLayout *mainLayout;
     QTableWidget *table;
@@ -78,6 +83,9 @@ private:
 
     //User creation wizard
     CreateUser *userWizard;
+
+    //Help window
+    QWidget *helpWizard;
 
     //Password re-generator
     MiniGenerateBox *newPassword;

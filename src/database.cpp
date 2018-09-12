@@ -388,7 +388,7 @@ void MainWindow::importFromFile()
         buf = getenv("HOME");
     #endif
 
-    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf.c_str()), QString("Credentials Database (*.crdb *.db);;All files (*.*)"));
+    QString filepath = QFileDialog::getOpenFileName(this, "Import", QString(buf.c_str()), QString("Credentials Database (*.crdb *.db, *.crdb.bak, *db.bak);;All files (*.*)"));
 
     if (filepath.isEmpty())
         return;

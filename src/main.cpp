@@ -7,10 +7,9 @@ int main(int argc, char *argv[])
 
     for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[i], "--lang") == 1)
+        if (strcmp(argv[i], "--lang") == 0)
         {
             locale = QString(argv[i+1]);
-            i++;
         }
     }
 
@@ -26,8 +25,10 @@ int main(int argc, char *argv[])
             translator.load(QString("/usr/local/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale);
     #endif
     app.installTranslator(&translator);
+    std::cout << "Language set to " << locale.toStdString() << std::endl;
 
     MainWindow window;
+    window.setLanguage(locale);
 
     //Setting up user struct, starting with username
 

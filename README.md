@@ -14,10 +14,9 @@ Made with Qt 5.7. It has a couple more functions than its console counterpart, l
 
 - All: Merged import & convert functions (having both separated was redundant)
 - All: Removed Edit menu after getting feedback that no one used it (to be fair, neither did I)
+- All: New Help menu that looks really retro
 
-**KNOWN ISSUES**
-
-- [UNCONFIRMED] All: The program *might* be leaking memory, though I'm not sure where or why yet
+**The memory leak appears to be fixed, though that might require more thorough testing**
 
 # Download links
 

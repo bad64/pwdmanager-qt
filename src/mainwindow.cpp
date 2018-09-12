@@ -145,6 +145,16 @@ MainWindow::MainWindow()
     setMinimumSize(640,480);
 }
 
+MainWindow::~MainWindow()
+{
+
+}
+
+void MainWindow::setLanguage(QString language)
+{
+    currentLanguage = language;
+}
+
 void MainWindow::init()
 {
     //Database to QTableWidget conversion

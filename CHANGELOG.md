@@ -6,7 +6,4 @@
 
 - All: Merged import & convert functions (having both separated was redundant)
 - All: Removed Edit menu after getting feedback that no one used it (to be fair, neither did I)
-
-**KNOWN ISSUES**
-
-- [UNCONFIRMED] All: The program *might* be leaking memory, though I'm not sure where or why yet
+- All: New Help menu that looks really retro

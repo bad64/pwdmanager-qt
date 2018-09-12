@@ -2,17 +2,8 @@
 
 void MainWindow::help()
 {
-    QMessageBox::about(this, tr("Help"), tr("Add a new row with New Entry.\n"
-                                            "Double click on a cell, or highlight it then press the Edit button to edit its contents.\n"
-                                            "Highlight a cell and press Delete to erase the entire row.\n"
-                                            "Copy copies the highlighted row's password field into your OS' clipboard.\n"
-                                            "Move rows around with Ctrl+Up or Ctrl+Down.\n\n"
-                                            "The search field looks for a case-insensitive match of the string entered. It is, however, accent-sensitive (e.g. "
-                                            "it will not match \"Umlaut\" and \"Ümlaut\").\n"
-                                            "Press Ctrl+H to hide/unhide the table (if someone is spying on you !)\n\n"
-                                            "In case things go horribly wrong during a transaction (e.g. power loss), you can find a backup of the database "
-                                            "in the application data (%AppData%\\Roaming\\passwordmanager on Windows, $HOME/.passwordmanager on Linux) as a .bak "
-                                            "file. Import it in the manager, and you should get your passwords back like they were before the transaction.") );
+    helpWizard = new HelpWindow(currentLanguage);
+    helpWizard->show();
 }
 
 void MainWindow::about()
