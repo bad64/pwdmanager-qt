@@ -7,12 +7,23 @@ else:VERSION = 2.2.0
 
 win32 {
     DESTDIR = bin/win32
-    OBJECTS_DIR = bin/win32/obj/
-    MOC_DIR = bin/win32/moc/
-    RCC_DIR = bin/win32/rcc/
-    UI_DIR = bin/win32/ui/
+    OBJECTS_DIR = bin/win32
+    MOC_DIR = bin/win32
+    RCC_DIR = bin/win32
+    UI_DIR = bin/win32
 
     RC_ICONS = src/resources/pwdmanager-qt.ico
+
+    languagefiles.path = bin/win32/translations
+    languagefiles.files = src/translations/*.qm
+
+    help.path = bin/win32/help
+    help.files += src/help/*
+
+    INSTALLS += languagefiles \
+                help
+
+    QMAKE_POST_LINK = windeployqt bin/win32/pwdmanager-qt.exe
 }
 
 unix:!macx {
@@ -34,7 +45,8 @@ unix:!macx {
     help.files = src/help/*/*.html
 
     INSTALLS += target \
-                languagefiles
+                languagefiles \
+                help
 }
 
 QMAKE_CLEAN += object_script.* Makefile .qmake.stash
@@ -46,8 +58,7 @@ HEADERS += \
     src/mainwindow.h \
     src/createuser.h \
     src/minigeneratebox.h \
-    src/credentialsfile.h \
-    src/help.h
+    src/credentialsfile.h
 
 SOURCES += \
     src/main.cpp \
@@ -59,8 +70,7 @@ SOURCES += \
     src/createuser.cpp \
     src/minigeneratebox.cpp \
     src/credentialsfile.cpp \
-    src/askuserpassword.cpp \
-    src/help.cpp
+    src/askuserpassword.cpp
 
 TRANSLATIONS += \
     src/translations/pwdmanager-qt_fr.ts

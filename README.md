@@ -4,7 +4,7 @@ A large(ish) rework of my console-only multiplatform password manager that you c
 
 Made with Qt 5.7. It has a couple more functions than its console counterpart, like editing database rows, or cross-platform copy to clipboard.
 
-# Latest update: v2.1.4, 11/09/18
+# Latest update: v2.2.0b, 13/09/18
 
 **CODE CHANGES**
 
@@ -25,8 +25,10 @@ Made with Qt 5.7. It has a couple more functions than its console counterpart, l
 *Please note: You will need the Qt framework to build this software.*  
 Start off by cloning the repo. Navigate into the created folder through your console of choice, then;
 
-- To build on Windows: path\to\qmake.exe && mingw32-make && mingw32-make clean (or use Qt Creator. Your call)  
 - To build on Linux: qmake && make && sudo make install && make clean
+- To build on Windows:
+	- Via command line: qmake.exe && mingw32-make && mingw32-make install && mingw32-make clean (this assumes both qmake, mingw32-make, and windeployqt are present in your path, which might not be the case)
+	- Via Qt Creator: Import the pwdmanager-qt.pro file, set the config to Release, then compile it. Once you're done, you will need to run windeployqt. Drag-drop the pwdmanager-qt.exe file onto the windeployqt executable to do so. Then copy the help and translation folders in src/ to the executable folder. (Seriously it might be easier/faster to do it via cmd)
 
 **PRECOMPILED BINARIES**
 
