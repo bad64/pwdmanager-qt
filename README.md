@@ -18,8 +18,6 @@ Made with Qt 5.7. It has a couple more functions than its console counterpart, l
 - All: Removed Edit menu after getting feedback that no one used it (to be fair, neither did I)
 - All: New Help menu that looks really retro
 
-**The memory leak appears to be fixed, though that might require more thorough testing**
-
 # Download links
 
 **BUILDING FROM SOURCES**
