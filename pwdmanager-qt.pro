@@ -28,10 +28,10 @@ win32 {
 
 unix:!macx {
     DESTDIR = bin/linux
-    OBJECTS_DIR = bin/linux/obj/
-    MOC_DIR = bin/linux/moc/
-    RCC_DIR = bin/linux/rcc/
-    UI_DIR = bin/linux/ui/
+    OBJECTS_DIR = bin/linux
+    MOC_DIR = bin/linux
+    RCC_DIR = bin/linux
+    UI_DIR = bin/linux
 
     languagefiles.path = /usr/local/share/pwdmanager-qt/translations
     languagefiles.files = src/translations/*.qm
