@@ -72,7 +72,7 @@ SOURCES += \
     src/createuser.cpp \
     src/minigeneratebox.cpp \
     src/credentialsfile.cpp \
-    src/askuserpassword.cpp
+    src/auth.cpp
 
 TRANSLATIONS += \
     src/translations/pwdmanager-qt_fr.ts
