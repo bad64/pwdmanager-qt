@@ -1,3 +1,4 @@
+#include "includes.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -20,12 +21,11 @@ int main(int argc, char *argv[])
     QTranslator translator;
     #if (defined (_WIN32) || defined (_WIN64))
         translator.load(QString("translations\\pwdmanager-qt_") + locale);
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         if(!translator.load(QString("/usr/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale))
             translator.load(QString("/usr/local/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale);
     #endif
     app.installTranslator(&translator);
-    std::cout << "Language set to " << locale.toStdString() << std::endl;
 
     MainWindow window;
     window.setLanguage(locale);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
     #if (defined (_WIN32) || defined (_WIN64))
         window.user.username = getenv("USERNAME");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         window.user.username = getenv("USER");
     #endif
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     #if (defined (_WIN32) || defined (_WIN64))
         window.user.path = getenv("APPDATA");
         window.user.path.append("\\passwordmanager\\passwords.crdb");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         window.user.path = getenv("HOME");
         window.user.path.append("/.passwordmanager/passwords.crdb");
     #endif
@@ -85,6 +85,13 @@ int main(int argc, char *argv[])
     #if (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
         chmod(window.user.path.c_str(), S_IRWXU);
     #endif
+
+    //Identity check (to protect against pcjacking)
+    bool proceed;
+    QString password = QInputDialog::getText(nullptr, QObject::tr("Enter password"), QObject::tr("Please enter your account password:"), QLineEdit::Password, QString(), &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+
+    if (try_auth(window.user.username, password.toStdString()) == false)
+        exit(2);
 
     //Then render !
     window.show();

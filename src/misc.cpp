@@ -17,7 +17,7 @@ QString getURL(QString language)
             std::cout << "Localized help for language " << language.toStdString() << " not found, defaulting to en" << std::endl;
             return QString("help/en/index.html");
         }
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         QString path = QString("/usr/share/pwdmanager-qt/help/" + language + "/index.html");
 
         if (stat (path.toStdString().c_str(), &buffer) == 0)
@@ -45,7 +45,7 @@ int IsDir()
     #if (defined (_WIN32) || defined (_WIN64))
         temppath = getenv("APPDATA");
         temppath.append("\\passwordmanager");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         temppath = getenv("HOME");
         temppath.append("/.passwordmanager");
     #endif
@@ -65,7 +65,7 @@ int IsDir()
     {
         #if (defined (_WIN32) || defined (_WIN64))
             CreateDirectoryA(temppath.c_str(), NULL);
-        #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+        #elif (defined (LINUX) || defined (__linux__))
             mkdir(temppath.c_str(), S_IRWXU);
             chmod(temppath.c_str(), S_IRWXU);
         #endif

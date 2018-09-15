@@ -1,11 +1,27 @@
-#include "mainwindow.h"
+#include "includes.h"
 
-#if (defined (LINUX) || defined (__linux__))
-    //Most of the code in this section was provided by Zombie on the New Blood Discord. Credit where it's due and all that, cause I would have never figured that out on my own
-    int try_auth(std::string username, std::string password)
-    {
+bool try_auth(std::string username, std::string password)
+{
+    #if (defined (_WIN32) || defined (_WIN64))
+        HANDLE hToken;
+        if (LogonUserA(username.c_str(), ".", password.c_str(), LOGON32_LOGON_NETWORK, LOGON32_PROVIDER_DEFAULT, &hToken) != 0)
+        {
+            for (unsigned int i = 0; i < password.length(); i++) //Securely erase the password string
+                password[i] = '\0';
+            return true;
+        }
+        else
+        {
+            for (unsigned int i = 0; i < password.length(); i++)
+                password[i] = '\0';
+            return false;
+        }
+    #elif (defined (LINUX) || defined (__linux__))
+        //Most of the code in this section was provided by Zombie on the New Blood Discord.
+        //Credit where it's due and all that, cause I would have never figured that out on my own
+
         int result = 0;
-        pam_handle_t *handle = NULL;
+        pam_handle_t *handle = nullptr;
 
         pam_response *reply = (decltype(reply))malloc(sizeof(struct pam_response));
         reply->resp = strdup(password.c_str());
@@ -19,63 +35,32 @@
                                 return PAM_SUCCESS;
                             };
 
-        #define HANDLE_PAM_ERROR(handle, result) \
-            if(result != PAM_SUCCESS) { \
-                printf("%s\n", pam_strerror(handle, result)); \
-                return EXIT_FAILURE; \
-            }
-
-            result = pam_start("sudo", username.c_str(), &loc_conv, &handle);
-            HANDLE_PAM_ERROR(handle, result);
-
-            result = pam_authenticate(handle, 0);
-            HANDLE_PAM_ERROR(handle, result);
-
-            result = pam_end(handle, result);
-            HANDLE_PAM_ERROR(handle, result);
-        #undef HANDLE_PAM_ERROR
-
-        return 0;
-    }
-#endif
-
-int MainWindow::askUserPassword()
-{
-    bool proceed;
-    QString password = QInputDialog::getText(this, tr("Enter password"), tr("Please enter your account password:"), QLineEdit::Password, QString(), &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-
-    #if (defined (_WIN32) || defined (_WIN64))
-        if (proceed)
+        result = pam_start("sudo", username.c_str(), &loc_conv, &handle);
+        if(result != PAM_SUCCESS)
         {
-            HANDLE hToken;
-            if (LogonUserA(user.username.c_str(), ".", password.toStdString().c_str(), LOGON32_LOGON_NETWORK, LOGON32_PROVIDER_DEFAULT, &hToken) != 0)
-            {
-                password = QString();
-                return 1;
-            }
-            else
-            {
-                password = QString();
-                return 0;
-            }
+            for (unsigned int i = 0; i < password.length(); i++)
+                password[i] = '\0';
+            return false;
         }
-        else
-            return 0;
-    #elif (defined (LINUX) || defined (__linux__))
-        if (proceed)
+
+        result = pam_authenticate(handle, 0);
+        if(result != PAM_SUCCESS)
         {
-            if (try_auth(user.username, password.toStdString()) == 0)
-            {
-                password = QString();
-                return 1;
-            }
-            else
-            {
-                password = QString();
-                return 0;
-            }
+            for (unsigned int i = 0; i < password.length(); i++)
+                password[i] = '\0';
+            return false;
         }
-        else
-            return 0;
+
+        result = pam_end(handle, result);
+        if(result != PAM_SUCCESS)
+        {
+            for (unsigned int i = 0; i < password.length(); i++)
+                password[i] = '\0';
+            return false;
+        }
+
+        for (unsigned int i = 0; i < password.length(); i++)
+            password[i] = '\0';
+        return true;
     #endif
 }

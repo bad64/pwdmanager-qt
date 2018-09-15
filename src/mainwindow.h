@@ -5,7 +5,6 @@
 #include "createuser.h"
 #include "minigeneratebox.h"
 #include "credentialsfile.h"
-#include "help.h"
 #include <QtWidgets>
 
 class MainWindow : public QMainWindow
@@ -56,7 +55,9 @@ public slots:
     void about();
 
 private:
+    //Option strings
     QString currentLanguage;
+    QString lastUsedPath;
 
     //Main window
     QGridLayout *mainLayout;

@@ -19,12 +19,14 @@
 #if (defined (_WIN32) || defined (_WIN64))
     #include <windows.h>
     #include <winbase.h>
-#elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+#elif (defined (LINUX) || defined (__linux__))
     #include <unistd.h>
     #include <security/pam_appl.h>
 #endif
 
 #include "credentialsfile.h"
+
+bool try_auth(std::string username, std::string password);
 
 struct User
 {

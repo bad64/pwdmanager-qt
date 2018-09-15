@@ -384,7 +384,7 @@ void MainWindow::importFromFile()
     #if (defined (_WIN32) || defined (_WIN64))
         buf = getenv("USERPROFILE");
         buf.append("\\Documents");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         buf = getenv("HOME");
     #endif
 
@@ -442,7 +442,7 @@ void MainWindow::exportToFile()
     #if (defined (_WIN32) || defined (_WIN64))
         buf = getenv("USERPROFILE");
         buf.append("\\Documents");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         buf = getenv("HOME");
     #endif
 
@@ -471,7 +471,7 @@ void MainWindow::convertOldFile(QString filepath)
     #if (defined (_WIN32) || defined (_WIN64))
         buf = getenv("APPDATA");
         buf.append("\\passwordmanager");
-    #elif (defined (LINUX) || defined (__linux__) || defined(__APPLE__))
+    #elif (defined (LINUX) || defined (__linux__))
         buf = getenv("HOME");
     #endif
 

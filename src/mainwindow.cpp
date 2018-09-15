@@ -155,6 +155,17 @@ void MainWindow::setLanguage(QString language)
     currentLanguage = language;
 }
 
+int MainWindow::askUserPassword()
+{
+    bool proceed;
+    QString password = QInputDialog::getText(this, tr("Enter password"), tr("Please enter your account password:"), QLineEdit::Password, QString(), &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+
+    if (try_auth(user.username, password.toStdString()))
+        return 1;
+    else
+        return 0;
+}
+
 void MainWindow::init()
 {
     //Database to QTableWidget conversion
