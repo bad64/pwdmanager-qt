@@ -2,23 +2,22 @@
 
 #if (defined (LINUX) || defined (__linux__))
     //Most of the code in this section was provided by Zombie on the New Blood Discord. Credit where it's due and all that, cause I would have never figured that out on my own
-
-    int conv_func(int num_msg, struct pam_message const **msg, struct pam_response **resp, void *appdata_ptr)
-    {
-        *resp = (struct pam_response *)appdata_ptr;
-        return PAM_SUCCESS;
-    }
-
     int try_auth(std::string username, std::string password)
     {
         int result = 0;
-        pam_handle_t *handle = nullptr;
+        pam_handle_t *handle = NULL;
 
-        struct pam_response *reply = (struct pam_response *)malloc(sizeof(struct pam_response));
+        pam_response *reply = (decltype(reply))malloc(sizeof(struct pam_response));
         reply->resp = strdup(password.c_str());
         reply->resp_retcode = 0;
 
-        struct pam_conv localconversation = { conv_func, reply };
+        pam_conv loc_conv;
+        loc_conv.appdata_ptr = reply;
+        loc_conv.conv = [](int num_msg, pam_message const **msg, pam_response **resp, void *appdata_ptr)
+                            {
+                                *resp = static_cast<pam_response *>(appdata_ptr);
+                                return PAM_SUCCESS;
+                            };
 
         #define HANDLE_PAM_ERROR(handle, result) \
             if(result != PAM_SUCCESS) { \
@@ -26,7 +25,7 @@
                 return EXIT_FAILURE; \
             }
 
-            result = pam_start("su", username.c_str(), &localconversation, &handle);
+            result = pam_start("sudo", username.c_str(), &loc_conv, &handle);
             HANDLE_PAM_ERROR(handle, result);
 
             result = pam_authenticate(handle, 0);
@@ -43,7 +42,7 @@
 int MainWindow::askUserPassword()
 {
     bool proceed;
-    QString password = QInputDialog::getText(this, tr("Enter password"), tr("Please enter your Windows account password:"), QLineEdit::Password, QString(), &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+    QString password = QInputDialog::getText(this, tr("Enter password"), tr("Please enter your account password:"), QLineEdit::Password, QString(), &proceed, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     #if (defined (_WIN32) || defined (_WIN64))
         if (proceed)
@@ -65,10 +64,16 @@ int MainWindow::askUserPassword()
     #elif (defined (LINUX) || defined (__linux__))
         if (proceed)
         {
-            if (try_auth(user.username, password.toStdString()))
+            if (try_auth(user.username, password.toStdString()) == 0)
+            {
+                password = QString();
                 return 1;
+            }
             else
+            {
+                password = QString();
                 return 0;
+            }
         }
         else
             return 0;
