@@ -4,7 +4,7 @@ A large(ish) rework of my console-only multiplatform password manager that you c
 
 Made with Qt 5.7. It has a couple more functions than its console counterpart, like editing database rows, or cross-platform copy to clipboard.
 
-# Latest update: v2.2.0b, 13/09/18
+# Latest update: v2.2.0, 15/09/18
 
 **CODE CHANGES**
 
