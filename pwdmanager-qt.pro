@@ -37,6 +37,7 @@ unix:!macx {
     languagefiles.files = src/translations/*.qm
 
     target.path = /usr/local/bin
+    target.files = bin/linux/pwdmanager-qt
 
     icon.path = /usr/share/pixmaps
     icon.files = src/resources/pwdmanager-qt.png
