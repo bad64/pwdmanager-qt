@@ -9,3 +9,4 @@
 - All: Merged import & convert functions (having both separated was redundant)
 - All: Removed Edit menu after getting feedback that no one used it (to be fair, neither did I)
 - All: New Help menu that looks really retro
+- Linux: PAM authentication now works as intended

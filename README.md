@@ -17,6 +17,7 @@ Made with Qt 5.7. It has a couple more functions than its console counterpart, l
 - All: Merged import & convert functions (having both separated was redundant)
 - All: Removed Edit menu after getting feedback that no one used it (to be fair, neither did I)
 - All: New Help menu that looks really retro
+- Linux: PAM authentication now works as intended
 
 # Download links
 
