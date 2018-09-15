@@ -34,4 +34,6 @@ Start off by cloning the repo. Navigate into the created folder through your con
 
 **PRECOMPILED BINARIES**
 
-Not gonna release precompiled binaries on experimental branch.
+[WINDOWS INSTALLER](https://github.com/bad64/pwdmanager-qt/releases/download/v2.2.0/pwdmanager-qt-v2.2.0-windows-setup.exe)  
+[WINDOWS ZIP](https://github.com/bad64/pwdmanager-qt/releases/download/v2.2.0/pwdmanager-qt-v2.2.0-windows.zip)  
+[LINUX DEB](https://github.com/bad64/pwdmanager-qt/releases/download/v2.2.0/pwdmanager-qt_amd64.deb)
