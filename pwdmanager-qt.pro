@@ -44,6 +44,8 @@ unix:!macx {
     help.path = /usr/local/share/pwdmanager-qt/help
     help.files = src/help/*/*.html
 
+    LIBS += -lpam
+
     INSTALLS += target \
                 languagefiles \
                 help
