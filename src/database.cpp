@@ -1,23 +1,15 @@
 #include "mainwindow.h"
 
-class readEncryptedBufferException : public std::runtime_error
+std::vector<DBRow> MainWindow::readFromFile(std::string path)
 {
-public:
-    readEncryptedBufferException(std::string const& msg):
-        std::runtime_error(msg)
-    {}
-};
+    std::vector<DBRow> database;
 
-std::vector<DBRow> MainWindow::readFromFile()
-{
-    db.clear();
-
-    std::fstream file(user.path, std::ios::in | std::ios::binary);
+    std::fstream file(path, std::ios::in | std::ios::binary);
 
     if (!file)
     {
-        createBinaryFile(user.path);    //If db does not exist, create it
-        file.open(user.path, std::ios::in | std::ios::binary);
+        createBinaryFile(path);    //If db does not exist, create it
+        file.open(path, std::ios::in | std::ios::binary);
     }
 
     //Checking header to see if file is valid
@@ -60,7 +52,7 @@ std::vector<DBRow> MainWindow::readFromFile()
             lines = 0;
 
             //Get the number of entries in the file
-            int startOfText = file.tellg();
+            int startOfText = static_cast<int>(file.tellg());
 
             while (file)
             {
@@ -70,7 +62,7 @@ std::vector<DBRow> MainWindow::readFromFile()
             }
 
             file.close();
-            file.open(user.path, std::ios::in | std::ios::binary);
+            file.open(path, std::ios::in | std::ios::binary);
             file.seekg(startOfText);    //Back to end of header
 
             //Change status to tell the user that the file is good
@@ -83,66 +75,53 @@ std::vector<DBRow> MainWindow::readFromFile()
             std::string encryptedbuf;
             file.get(buf);
 
-            try
+            for (unsigned int i = 0; i < lines; i++)
             {
-                for (unsigned int i = 0; i < lines; i++)
+                database.emplace_back();
+
+                while (buf != ',')
                 {
-                    db.emplace_back();
-
-                    while (buf != ',')
-                    {
-                        if (buf != ',')
-                            ssbuf << buf;
-                        file.get(buf);
-                    }
-
-                    encryptedbuf = xorCrypt(ssbuf.str());
-                    if (encryptedbuf.empty())
-                        throw readEncryptedBufferException("Error reading from file\n");
-                    db[i].username = encryptedbuf.c_str();
-                    ssbuf.str(std::string());
+                    if (buf != ',')
+                        ssbuf << buf;
                     file.get(buf);
+                }
 
-                    while (buf != ',')
-                    {
-                        if (buf != ',')
-                            ssbuf << buf;
+                encryptedbuf = xorCrypt(ssbuf.str());
+                database[i].username = encryptedbuf.c_str();
+                ssbuf.str(std::string());
+                file.get(buf);
 
-                        file.get(buf);
-                    }
-
-                    encryptedbuf = xorCrypt(ssbuf.str());
-                    if (encryptedbuf.empty())
-                        throw readEncryptedBufferException("Error reading from file\n");
-                    db[i].purpose = encryptedbuf.c_str();
-                    ssbuf.str(std::string());
-                    file.get(buf);
-
-                    while (buf != '\x01E')
-                    {
-                        if (buf != '\x01E')
-                            ssbuf << buf;
-                        file.get(buf);
-                    }
-
-                    encryptedbuf = xorCrypt(ssbuf.str());
-                    if (encryptedbuf.empty())
-                        throw readEncryptedBufferException("Error reading from file\n");
-                    db[i].password = encryptedbuf.c_str();
-                    ssbuf.str(std::string());
+                while (buf != ',')
+                {
+                    if (buf != ',')
+                        ssbuf << buf;
 
                     file.get(buf);
                 }
-            }
-            catch (std::exception &e)
-            {
-                restore();
+
+                encryptedbuf = xorCrypt(ssbuf.str());
+                database[i].purpose = encryptedbuf.c_str();
+                ssbuf.str(std::string());
+                file.get(buf);
+
+                while (buf != '\x01E')
+                {
+                    if (buf != '\x01E')
+                        ssbuf << buf;
+                    file.get(buf);
+                }
+
+                encryptedbuf = xorCrypt(ssbuf.str());
+                database[i].password = encryptedbuf.c_str();
+                ssbuf.str(std::string());
+
+                file.get(buf);
             }
         }
     }
 
     file.close();
-    return db;
+    return database;
 }
 
 void MainWindow::writeToFile()
@@ -185,7 +164,7 @@ void MainWindow::deleteRow()
                 return;
             else
             {
-                unsigned int i = table->selectionModel()->currentIndex().row();
+                int i = table->selectionModel()->currentIndex().row();
                 db.erase(db.begin()+i);
             }
         }
@@ -205,11 +184,11 @@ void MainWindow::edit()
         if (selection->hasSelection())
         {
             backup();
-            int i = table->selectionModel()->currentIndex().row();
-            int j = table->selectionModel()->currentIndex().column();
+            unsigned int i = static_cast<unsigned int>(table->selectionModel()->currentIndex().row());
+            unsigned int j = static_cast<unsigned int>(table->selectionModel()->currentIndex().column());
 
 
-            QString textbuffer = table->model()->data(table->model()->index(i, j)).toString();
+            QString textbuffer = table->model()->data(table->model()->index(static_cast<int>(i), static_cast<int>(j))).toString();
             std::string previousValue;
             bool proceed = true;
 
@@ -225,7 +204,7 @@ void MainWindow::edit()
                break;
             case 2:
                previousValue = db[i].password;
-               newPassword = new MiniGenerateBox(i, db[i].password);
+               newPassword = new MiniGenerateBox(static_cast<int>(i), db[i].password);
                QWidget::connect(newPassword, SIGNAL(returnPassword(uint, std::string)), this, SLOT(setNewPassword(uint, std::string)));
                newPassword->exec();
                delete newPassword;
@@ -334,10 +313,10 @@ void MainWindow::moveRowUp()
 
            if (i - 1 >= 0)
            {
-               DBRow temp = db[i-1];
+               DBRow temp = db[static_cast<size_t>(i)-1];
 
-               db[i-1] = db[i];
-               db[i] = temp;
+               db[static_cast<size_t>(i)-1] = db[static_cast<size_t>(i)];
+               db[static_cast<size_t>(i)] = temp;
 
                writeToFile();
                refreshView();
@@ -358,15 +337,15 @@ void MainWindow::moveRowDown()
 
         if (selection->hasSelection())
         {
-           unsigned int i = table->selectionModel()->currentIndex().row();
-           unsigned int j = table->selectionModel()->currentIndex().column();
+           int i = table->selectionModel()->currentIndex().row();
+           int j = table->selectionModel()->currentIndex().column();
 
-           if (i + 1 < lines)
+           if (static_cast<unsigned int>(i) + 1 < lines)
            {
-               DBRow temp = db[i+1];
+               DBRow temp = db[static_cast<size_t>(i)+1];
 
-               db[i+1] = db[i];
-               db[i] = temp;
+               db[static_cast<size_t>(i)+1] = db[static_cast<size_t>(i)];
+               db[static_cast<size_t>(i)] = temp;
 
                writeToFile();
                refreshView();
@@ -401,7 +380,7 @@ void MainWindow::importFromFile()
     QString ext = info.suffix();
 
     //Check if valid file
-    if ((ext == "crdb") || (ext == "bak"))
+    if ((ext.toStdString() == "crdb") || (ext.toStdString() == "bak"))
     {
         char nbuf;
         newfile.get(nbuf);
@@ -429,11 +408,93 @@ void MainWindow::importFromFile()
         originalfile.close();
         refreshView();
     }
-    else if (ext == "db")
+    else if (ext.toStdString() == "db")
     {
         convertOldFile(filepath);
     }
+    else
+    {
+        std::cout << "Tried to open " << ext.toStdString() << " file" << std::endl;
+    }
+}
 
+void MainWindow::merge()
+{
+    std::string buf;
+    #if (defined (_WIN32) || defined (_WIN64))
+        buf = getenv("USERPROFILE");
+        buf.append("\\Documents");
+    #elif (defined (LINUX) || defined (__linux__))
+        buf = getenv("HOME");
+    #endif
+
+    QString filepath = QFileDialog::getOpenFileName(this, "Merge with...", QString(buf.c_str()), QString("Credentials Database (*.crdb *.crdb.bak);;All files (*.*)"));
+
+    if (filepath.isEmpty())
+        return;
+
+    backup();
+
+    std::fstream newfile(filepath.toStdString().c_str(), std::ios::in | std::ios::binary);
+    QFileInfo info(filepath);
+    QString ext = info.suffix();
+
+    //Check if valid file
+    if ((ext == "crdb") || (ext == "bak"))
+    {
+        char nbuf;
+        newfile.get(nbuf);
+
+        if (nbuf != '\x001')
+        {
+            QMessageBox::critical(this, tr("Invalid file"), tr("This file does not appear to be a valid file !"), QMessageBox::Ok);
+
+            newfile.close();
+            refreshView();
+
+            return;
+        }
+
+        std::cout << "Reading file " << filepath.toStdString() << " into temp db" << std::endl;
+        std::vector<DBRow> tempdb = readFromFile(filepath.toStdString());
+        bool match = false;
+
+        std::cout << "Entering comparison test loop" << std::endl;
+        for (unsigned int i = 0; i < tempdb.size(); i++)
+        {
+            for (unsigned int j = 0; j < db.size(); j++)
+            {
+                if ((tempdb[i].username == db[j].username) && (tempdb[i].username == db[j].username) && (tempdb[i].password == db[j].password))
+                {
+                    match = true;
+                    break;
+                }
+                else
+                    match = false;
+            }
+
+            if (!match)
+            {
+                db.emplace_back();
+                db[db.size()-1].username = tempdb[i].username;
+                db[db.size()-1].purpose = tempdb[i].purpose;
+                db[db.size()-1].password = tempdb[i].password;
+            }
+        }
+    }
+    else if (ext == "db")
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot convert old file format for merging !"), QMessageBox::Ok);
+
+        newfile.close();
+        refreshView();
+
+        return;
+    }
+
+    newfile.close();
+    writeToFile();
+    refreshView();
 }
 
 void MainWindow::exportToFile()
@@ -446,7 +507,7 @@ void MainWindow::exportToFile()
         buf = getenv("HOME");
     #endif
 
-    QString filepath = QFileDialog::getSaveFileName(this, "exportToFile", QString(buf.c_str()), QString("Credentials Database (*.crbd)"));
+    QString filepath = QFileDialog::getSaveFileName(this, "exportToFile", QString(buf.c_str()), QString("Credentials Database (*.crdb)"));
 
     std::fstream file(filepath.toStdString().c_str(), std::ios::out | std::ios::binary);
     file << '\x001' << "CRDNTLS" << '\x002';
@@ -509,7 +570,7 @@ void MainWindow::convertOldFile(QString filepath)
             getline(file, templine);
 
             char delimiter = ',';
-            int pos = 0;
+            unsigned int pos = 0;
 
             std::string token = templine.substr(0, templine.find(delimiter));
             pos = templine.find(delimiter, pos) + 1;

@@ -23,7 +23,7 @@ public:
 
 public slots:
     //database.cpp
-    std::vector<DBRow> readFromFile();
+    std::vector<DBRow> readFromFile(std::string path);
     void writeToFile();
     void deleteRow();
     void edit();
@@ -33,6 +33,7 @@ public slots:
     void moveRowUp();
     void moveRowDown();
     void importFromFile();
+    void merge();
     void exportToFile();
     void convertOldFile(QString filepath);
 

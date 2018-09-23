@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     }
 
     //Setting up the database array
-    window.db = window.readFromFile();
+    window.db = window.readFromFile(window.user.path);
     window.init();
 
     //Linux file permissions

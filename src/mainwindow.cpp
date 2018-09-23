@@ -27,6 +27,10 @@ MainWindow::MainWindow()
         optionFile->addAction(actionRestore);
         QObject::connect(actionRestore, SIGNAL(triggered()), this, SLOT(restore()));
 
+        QAction *actionMerge = new QAction(tr("Merge"), this);
+        optionFile->addAction(actionMerge);
+        QObject::connect(actionMerge, SIGNAL(triggered()), this, SLOT(merge()));
+
         QAction *actionRefresh = new QAction(tr("Refresh View"), this);
         actionRefresh->setShortcut(Qt::Key_F5);
         optionFile->addAction(actionRefresh);
@@ -229,7 +233,8 @@ void MainWindow::hideTable()
 
 void MainWindow::refreshView()
 {
-    db = readFromFile();
+    db.clear();
+    db = readFromFile(user.path);
 
     table->setRowCount(0);
 
