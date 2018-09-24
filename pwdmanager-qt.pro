@@ -18,7 +18,7 @@ win32 {
     languagefiles.files = src/translations/*.qm
 
     help.path = bin/win32/help
-    help.files += src/help/*
+    help.files += src/help/*/*.html
 
     INSTALLS += languagefiles \
                 help
