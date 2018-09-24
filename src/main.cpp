@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 {
     //Some command line arguments
     QString locale = QLocale::system().name().section('_', 0, 0);
+    bool printVersion = false;
 
     for (int i = 1; i < argc; i++)
     {
@@ -12,6 +13,22 @@ int main(int argc, char *argv[])
         {
             locale = QString(argv[i+1]);
         }
+        else if (strcmp(argv[i], "-v") == 0)
+        {
+            printVersion = true;
+        }
+    }
+
+    if (printVersion)
+    {
+        std::stringstream aboutString;
+        aboutString << QObject::tr("pwdmanager-qt version ").toStdString() << VERSION << QObject::tr(" by Lou VINCENT aka Bad64.").toStdString() << std::endl;
+        aboutString << QObject::tr("Made with Qt ").toStdString() << qVersion() <<QObject:: tr(", with GCC version ").toStdString() << __VERSION__ << QObject::tr(", based on pwdmanager (also by Bad64)").toStdString() << std::endl;
+        aboutString << QObject::tr("If launched with current parameters, the display language would be set as ").toStdString() << locale.toStdString() << "." << std::endl << std::endl;
+
+        std::cout << aboutString.str() << std::endl;
+
+        exit(0);
     }
 
     //Begin Qt
