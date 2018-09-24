@@ -19,18 +19,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (printVersion)
-    {
-        std::stringstream aboutString;
-        aboutString << QObject::tr("pwdmanager-qt version ").toStdString() << VERSION << QObject::tr(" by Lou VINCENT aka Bad64.").toStdString() << std::endl;
-        aboutString << QObject::tr("Made with Qt ").toStdString() << qVersion() <<QObject:: tr(", with GCC version ").toStdString() << __VERSION__ << QObject::tr(", based on pwdmanager (also by Bad64)").toStdString() << std::endl;
-        aboutString << QObject::tr("If launched with current parameters, the display language would be set as ").toStdString() << locale.toStdString() << "." << std::endl << std::endl;
-
-        std::cout << aboutString.str() << std::endl;
-
-        exit(0);
-    }
-
     //Begin Qt
     QApplication app(argc, argv);
 
@@ -43,6 +31,19 @@ int main(int argc, char *argv[])
             translator.load(QString("/usr/local/share/pwdmanager-qt/translations/pwdmanager-qt_") + locale);
     #endif
     app.installTranslator(&translator);
+
+    //If we just want the version
+    if (printVersion)
+    {
+        std::stringstream aboutString;
+        aboutString << QObject::tr("pwdmanager-qt version ").toStdString() << VERSION << QObject::tr(" by Lou VINCENT aka Bad64.").toStdString() << std::endl;
+        aboutString << QObject::tr("Made with Qt ").toStdString() << qVersion() <<QObject:: tr(", with GCC version ").toStdString() << __VERSION__ << QObject::tr(", based on pwdmanager (also by Bad64)").toStdString() << std::endl;
+        aboutString << QObject::tr("If launched with current parameters, the display language would be set as ").toStdString() << locale.toStdString() << "." << std::endl;
+
+        std::cout << aboutString.str() << std::endl;
+
+        exit(0);
+    }
 
     MainWindow window;
     window.setLanguage(locale);

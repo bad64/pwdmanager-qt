@@ -18,7 +18,8 @@ win32 {
     languagefiles.files = src/translations/*.qm
 
     help.path = bin/win32/help
-    help.files += src/help/*/*.html
+    help.files += src/help/en \
+                    src/help/fr
 
     INSTALLS += languagefiles \
                 help
@@ -43,7 +44,8 @@ unix:!macx {
     icon.files = src/resources/pwdmanager-qt.png
 
     help.path = /usr/local/share/pwdmanager-qt/help
-    help.files = src/help/*/*.html
+    help.files += src/help/en \
+                    src/help/fr
 
     LIBS += -lpam
 
