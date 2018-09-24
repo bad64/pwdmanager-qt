@@ -23,7 +23,7 @@ bool try_auth(std::string username, std::string password)
         int result = 0;
         pam_handle_t *handle = nullptr;
 
-        pam_response *reply = (decltype(reply))malloc(sizeof(struct pam_response));
+        pam_response *reply = static_cast<decltype(reply)>malloc(sizeof(struct pam_response));
         reply->resp = strdup(password.c_str());
         reply->resp_retcode = 0;
 
@@ -31,6 +31,8 @@ bool try_auth(std::string username, std::string password)
         loc_conv.appdata_ptr = reply;
         loc_conv.conv = [](int num_msg, pam_message const **msg, pam_response **resp, void *appdata_ptr)
                             {
+                                (void)num_msg;
+                                (void)msg;
                                 *resp = static_cast<pam_response *>(appdata_ptr);
                                 return PAM_SUCCESS;
                             };

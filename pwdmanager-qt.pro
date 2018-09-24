@@ -80,5 +80,3 @@ TRANSLATIONS += \
 
 RESOURCES += \
     src/resources.qrc
-
-QMAKE_CXXFLAGS += -std=c++11 -ansi -pedantic-errors
