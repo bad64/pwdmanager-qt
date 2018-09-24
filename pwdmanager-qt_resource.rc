@@ -7,8 +7,8 @@
 IDI_ICON1	ICON	DISCARDABLE	"E:\\Dev\\Cpp\\Projects\\pwdmanager-qt\\src\\resources\\pwdmanager-qt.ico"
 
 VS_VERSION_INFO VERSIONINFO
-	FILEVERSION 2,2,0,0
-	PRODUCTVERSION 2,2,0,0
+	FILEVERSION 2,2,1,0
+	PRODUCTVERSION 2,2,1,0
 	FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
 	FILEFLAGS VS_FF_DEBUG
@@ -25,11 +25,11 @@ VS_VERSION_INFO VERSIONINFO
 			BEGIN
 				VALUE "CompanyName", "\0"
 				VALUE "FileDescription", "\0"
-				VALUE "FileVersion", "2.2.0.0\0"
+				VALUE "FileVersion", "2.2.1.0\0"
 				VALUE "LegalCopyright", "\0"
 				VALUE "OriginalFilename", "pwdmanager-qt.exe\0"
 				VALUE "ProductName", "pwdmanager-qt\0"
-				VALUE "ProductVersion", "2.2.0.0\0"
+				VALUE "ProductVersion", "2.2.1.0\0"
 			END
 		END
 		BLOCK "VarFileInfo"
