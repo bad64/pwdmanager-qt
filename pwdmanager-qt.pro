@@ -2,8 +2,8 @@ CONFIG -= debug_and_release
 CONFIG += release
 
 
-win32:VERSION = 2.2.0.0
-else:VERSION = 2.2.0
+win32:VERSION = 2.2.1.0
+else:VERSION = 2.2.1
 
 win32 {
     DESTDIR = bin/win32
@@ -80,3 +80,5 @@ TRANSLATIONS += \
 
 RESOURCES += \
     src/resources.qrc
+
+QMAKE_CXXFLAGS += -ansi -pedantic-errors
