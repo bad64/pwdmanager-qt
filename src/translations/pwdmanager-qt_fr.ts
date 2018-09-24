@@ -426,42 +426,42 @@ Cette opération peut échouer si le fichier est malformé. Désirez-vous contin
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../main.cpp" line="25"/>
+        <location filename="../main.cpp" line="39"/>
         <source>pwdmanager-qt version </source>
         <translation>pwdmanager-qt version </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="25"/>
+        <location filename="../main.cpp" line="39"/>
         <source> by Lou VINCENT aka Bad64.</source>
         <translation>par Lou VINCENT aka Bad64.</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="26"/>
+        <location filename="../main.cpp" line="40"/>
         <source>Made with Qt </source>
         <translation>Crée avec Qt </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="26"/>
+        <location filename="../main.cpp" line="40"/>
         <source>, with GCC version </source>
         <translation>, avec GCC version </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="26"/>
+        <location filename="../main.cpp" line="40"/>
         <source>, based on pwdmanager (also by Bad64)</source>
         <translation>, basé sur pwdmanager (également par Bad64)</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="27"/>
+        <location filename="../main.cpp" line="41"/>
         <source>If launched with current parameters, the display language would be set as </source>
         <translation>Lancé avec les paramètres actuels, le langage d&apos;affichage utilisé serait </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="108"/>
+        <location filename="../main.cpp" line="109"/>
         <source>Enter password</source>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="108"/>
+        <location filename="../main.cpp" line="109"/>
         <source>Please enter your account password:</source>
         <translation>Veuillez entrer votre mot de passe:</translation>
     </message>
