@@ -22,7 +22,40 @@ int main(int argc, char *argv[])
         {
             if (std::string(argv[i+1]).substr(strlen(argv[i+1])-5) == ".crdb")
             {
-                inputfile = std::string(argv[i+1]);
+                #if (defined (_WIN32) || defined (_WIN64))
+                    TCHAR cwd[255];
+                    if (GetCurrentDirectory(255, cwd) != 0)
+                    {
+                        for (int i = 0; i < 255; i++)
+                        {
+                            if (cwd[i] != '\0')
+                                inputfile += static_cast<char>(cwd[i]);
+                            else
+                                break;
+                        }
+
+                        inputfile += '\\';
+                        inputfile += std::string(argv[i+1]);
+                    }
+                    else
+                    {
+                        std::cout << "GetCurrentDirectory() error" << std::endl;
+                    }
+                #elif (defined (LINUX) || defined (__linux__))
+                    char cwd[255];
+                    if(getcwd(cwd, sizeof(cwd)) != NULL)
+                    {
+                        inputfile = cwd;
+                        inputfile += '/';
+                        inputfile += std::string(argv[i+1]);
+                    }
+                    else
+                    {
+                        std::cout << "getcwd() error" << std::endl;
+                    }
+                #endif
+
+                std::cout << inputfile << std::endl;
             }
         }
     }
