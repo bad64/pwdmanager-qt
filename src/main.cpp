@@ -6,6 +6,7 @@ int main(int argc, char *argv[])
     //Some command line arguments
     QString locale = QLocale::system().name().section('_', 0, 0);
     bool printVersion = false;
+    std::string inputfile = "";
 
     for (int i = 1; i < argc; i++)
     {
@@ -16,6 +17,13 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "-v") == 0)
         {
             printVersion = true;
+        }
+        else if (strcmp(argv[i], "--use") == 0)
+        {
+            if (std::string(argv[i+1]).substr(strlen(argv[i+1])-5) == ".crdb")
+            {
+                inputfile = std::string(argv[i+1]);
+            }
         }
     }
 
@@ -68,13 +76,22 @@ int main(int argc, char *argv[])
     srand(getSeed(window.user.username.c_str()));
 
     //Setting up database path
-    #if (defined (_WIN32) || defined (_WIN64))
-        window.user.path = getenv("APPDATA");
-        window.user.path.append("\\passwordmanager\\passwords.crdb");
-    #elif (defined (LINUX) || defined (__linux__))
-        window.user.path = getenv("HOME");
-        window.user.path.append("/.passwordmanager/passwords.crdb");
-    #endif
+    if (inputfile == "")
+    {
+        std::cout << "No file provided, using default" << std::endl;
+        #if (defined (_WIN32) || defined (_WIN64))
+            window.user.path = getenv("APPDATA");
+            window.user.path.append("\\passwordmanager\\passwords.crdb");
+        #elif (defined (LINUX) || defined (__linux__))
+            window.user.path = getenv("HOME");
+            window.user.path.append("/.passwordmanager/passwords.crdb");
+        #endif
+    }
+    else
+    {
+        std::cout << "Using " << inputfile << std::endl;
+        window.user.path = inputfile;
+    }
 
     if (window.user.path.empty())
     {
