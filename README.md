@@ -1,4 +1,6 @@
-# Password Manager, now with Qt !
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+ # Password Manager, now with Qt !
 
 A large(ish) rework of my console-only multiplatform password manager that you can find on this GitHub (right [here](https://github.com/bad64/pwdmanager)).
 

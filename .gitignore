@@ -1,0 +1,5 @@
+bin/*
+packages/*
+*.pro.user
+*.qmake.conf
+*.crdb
